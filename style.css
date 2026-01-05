@@ -50,16 +50,16 @@ body {
   /* Prigušena plavkasto-siva za manje važne tekstove */
 
   /* Status boje (indiktatori stanja) */
-  --status-normal: #2f80ed;
-  /* Plava */
+  --status-normal: #27ae60;
+  /* Zelena - Nema opasnosti */
   --status-pripremno: #f2c94c;
-  /* Žuta */
-  --status-redovna: #eb5757;
-  /* Crvena */
-  --status-izvanredna: #9b1c1c;
-  /* Tamno crvena */
-  --status-izvanredno: #5a0f0f;
-  /* Ekstremno crvena (skoro crna) */
+  /* Žuta - Moguća opasnost */
+  --status-redovna: #e67e22;
+  /* Narančasta - Aktivna obrana */
+  --status-izvanredna: #eb5757;
+  /* Crvena - Jaka obrana */
+  --status-izvanredno: #9b59b6;
+  /* Ljubičasta - Najjači stupanj/Poplava */
 
   /* Trend boje (raste/pada) */
   --trend-up: #f2994a;
@@ -217,6 +217,10 @@ body {
   text-align: center !important;
 }
 
+.text-left {
+  text-align: left !important;
+}
+
 .value--critical {
   color: var(--status-redovna);
 }
@@ -255,34 +259,41 @@ body {
 }
 
 .status--normalno {
-  background: rgba(47, 128, 237, 0.15);
+  background: rgba(39, 174, 96, 0.15);
+  /* Zelena */
   color: var(--status-normal);
-  border-color: rgba(47, 128, 237, 0.35);
+  border-color: rgba(39, 174, 96, 0.35);
 }
 
 .status--pripremno {
   background: rgba(242, 201, 76, 0.18);
+  /* Žuta */
   color: var(--status-pripremno);
   border-color: rgba(242, 201, 76, 0.4);
 }
 
 .status--redovna {
-  background: rgba(235, 87, 87, 0.18);
+  background: rgba(230, 126, 34, 0.18);
+  /* Narančasta */
   color: var(--status-redovna);
-  border-color: rgba(235, 87, 87, 0.5);
+  border-color: rgba(230, 126, 34, 0.5);
 }
 
 .status--izvanredna {
-  background: rgba(155, 28, 28, 0.35);
-  color: #ffd6d6;
-  border-color: rgba(155, 28, 28, 0.7);
+  background: rgba(235, 87, 87, 0.25);
+  /* Crvena */
+  color: var(--status-izvanredna);
+  border-color: rgba(235, 87, 87, 0.6);
 }
 
 .status--izvanredno {
-  background: rgba(90, 15, 15, 0.6);
-  color: #ffffff;
-  border-color: rgba(255, 80, 80, 0.8);
-  box-shadow: 0 0 18px rgba(255, 0, 0, 0.35);
+  background: rgba(155, 89, 182, 0.35);
+  /* Ljubičasta */
+  color: white;
+  /* Tekst bijeli na tamnijoj ljubičastoj radi kontrasta */
+  border-color: rgba(155, 89, 182, 0.7);
+  box-shadow: 0 0 15px rgba(155, 89, 182, 0.4);
+  /* Glow efekt */
 }
 
 /* ================================
@@ -399,6 +410,12 @@ body {
   font-size: 0.85rem;
 }
 
+.table--compact th,
+.table--compact td {
+  padding: 0.4rem 1rem;
+  /* Dodatno smanjeno s 0.8rem */
+}
+
 /* Column Widths */
 .th--w-30 {
   width: 30%;
@@ -420,12 +437,18 @@ body {
   width: 18%;
 }
 
+.th--w-25 {
+  width: 25%;
+}
+
 /* ================================
    DIONICE SPECIFIC STYLES
 ================================ */
 
 .dionica-code {
-  font-size: 1.6rem;
+  font-size: 2rem;
+  /* Povećano s 1.6rem */
+  font-weight: 700;
 }
 
 .vodotok-name {
@@ -434,17 +457,31 @@ body {
 
 .postaja-name {
   display: block;
+  white-space: pre-wrap;
+  /* Poštuj nove redove iz CSV-a */
 }
 
 .kriterij-text {
   color: var(--text-muted);
-  font-size: 0.8rem;
+  font-size: 1.15rem;
+  /* Povećano s 1rem */
   white-space: pre-wrap;
   display: block;
 }
 
-.person-name {
+.person-lead {
+  font-weight: 600;
+  /* Podebljano za bolju čitljivost */
+  font-size: 1.3rem;
+  /* Značajno povećano */
+  white-space: pre-wrap;
+  /* Poštuj nove redove */
+}
+
+.person-sub {
   font-size: 0.9rem;
+  /* Smanjeno za zamjenika i vodočuvare */
+  white-space: pre-wrap;
 }
 
 /* ================================

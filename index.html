@@ -261,8 +261,8 @@
       nextSlide();
     });
 
-    // Podrška za tipkovnicu (strelice i razmaknica)
-    document.addEventListener("keydown", (e) => {
+    // Funkcija za obradu događaja tipkovnice
+    function handleKeydown(e) {
       if (e.key === "ArrowLeft") {
         previousSlide();
       } else if (e.key === "ArrowRight") {
@@ -270,6 +270,28 @@
       } else if (e.key === " " || e.key === "Spacebar") {
         e.preventDefault(); // Spriječi skrolanje stranice kad se stisne Space
         toggleRotation();
+      }
+    }
+
+    // Podrška za tipkovnicu (strelice i razmaknica) na glavnom prozoru
+    document.addEventListener("keydown", handleKeydown);
+
+    // FIX: Iframe preuzima fokus pa tipke ne rade.
+    // Ovdje kažemo: "Kad se iframe učita, slušaj tipke i unutar njega."
+    frame.addEventListener("load", () => {
+      try {
+        // Pokušavamo pristupiti dokumentu unutar iframe-a
+        const iframeDoc = frame.contentDocument || frame.contentWindow.document;
+
+        // Dodajemo isti osluškivač (handleKeydown) i tamo
+        iframeDoc.addEventListener("keydown", handleKeydown);
+
+        // Opcionalno: Klik unutar iframe-a vraća fokus na glavni prozor (ako želimo)
+        // iframeDoc.addEventListener("click", () => window.focus());
+      } catch (err) {
+        // Ovo se može dogoditi ako je iframe s druge domene (CORS zaštita), 
+        // ali kod nas su lokalne datoteke pa bi trebalo raditi.
+        console.warn("Nije moguće dodati event listener na iframe:", err);
       }
     });
 

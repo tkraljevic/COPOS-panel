@@ -74,12 +74,26 @@
             if (!statusText) return "";
             const lower = statusText.toLowerCase(); // Pretvaramo u mala slova za lakšu usporedbu
 
-            // Provjeravamo sadrži li tekst ključne riječi
-            if (lower.includes("pripremno")) return "status--pripremno";
-            if (lower.includes("redovna")) return "status--redovna";
-            if (lower.includes("izvanredna")) return "status--izvanredna";
+            // Redoslijed je važan zbog preklapanja riječi (npr. izvanredno sadrži izvanredn)
+
+            // 1. IZVANREDNO STANJE (Najjače - Ljubičasta)
             if (lower.includes("izvanredno")) return "status--izvanredno";
-            if (lower.includes("normalno")) return "status--normalno";
+
+            // 2. IZVANREDNE MJERE / IZVANREDNA OBRANA (Crvena)
+            // Matchevi: "izvanredne", "izvanredna"
+            if (lower.includes("izvanredn")) return "status--izvanredna";
+
+            // 3. REDOVNE MJERE / REDOVNA OBRANA (Narančasta)
+            // Matchevi: "redovne", "redovna"
+            if (lower.includes("redovn")) return "status--redovna";
+
+            // 4. PRIPREMNO STANJE (Žuta)
+            // Matchevi: "pripremno", "priprema"
+            if (lower.includes("pripremno") || lower.includes("pripremn")) return "status--pripremno";
+
+            // 5. NORMALNO STANJE (Zelena)
+            if (lower.includes("normaln")) return "status--normalno";
+
             return "status--nema-podataka";
         }
 

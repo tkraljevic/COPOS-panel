@@ -44,11 +44,12 @@
             <table class="table table--compact" id="dataTable" style="display: none;">
                 <thead>
                     <tr>
-                        <th class="th--w-30">Dionica / Vodotok</th>
-                        <th class="th--w-20">Mjerodavna Postaja</th>
+                        <th class="th--w-25">Dionica / Vodotok</th>
+                        <th class="th--w-15">Status</th>
+                        <th class="th--w-15">Mjerodavna Postaja</th>
                         <th class="th--w-15">Kriterij</th>
-                        <th class="th--w-17">Rukovoditelj</th>
-                        <th class="th--w-18">Zamjenik</th>
+                        <th class="th--w-20">Rukovoditelj / Zamjenik</th>
+                        <th class="th--w-10">Vodočuvari</th>
                     </tr>
                 </thead>
 
@@ -62,8 +63,41 @@
 
     </div>
 
+    <!-- Uključujemo naš parser za CSV -->
     <script src="js/csv-parser.js"></script>
     <script>
+        /**
+         * Pomoćna funkcija: Određuje boju statusa
+         * @param {string} statusText
+         * @returns {string} ime CSS klase
+         */
+        function getStatusClass(statusText) {
+            if (!statusText) return "";
+            const lower = statusText.toLowerCase();
+
+            // Redoslijed je važan zbog preklapanja riječi (npr. izvanredno sadrži izvanredn)
+
+            // 1. IZVANREDNO STANJE (Najjače - Ljubičasta)
+            if (lower.includes("izvanredno")) return "status--izvanredno";
+
+            // 2. IZVANREDNE MJERE / IZVANREDNA OBRANA (Crvena)
+            // Matchevi: "izvanredne", "izvanredna"
+            if (lower.includes("izvanredn")) return "status--izvanredna";
+
+            // 3. REDOVNE MJERE / REDOVNA OBRANA (Narančasta)
+            // Matchevi: "redovne", "redovna"
+            if (lower.includes("redovn")) return "status--redovna";
+
+            // 4. PRIPREMNO STANJE (Žuta)
+            // Matchevi: "pripremno", "priprema"
+            if (lower.includes("pripremno") || lower.includes("pripremn")) return "status--pripremno";
+
+            // 5. NORMALNO STANJE (Zelena)
+            if (lower.includes("normaln")) return "status--normalno";
+
+            return "status--nema-podataka";
+        }
+
         async function loadData() {
             const loading = document.getElementById('loadingState');
             const error = document.getElementById('errorState');
@@ -116,10 +150,12 @@
             tbody.innerHTML = "";
 
             rows.forEach(row => {
-                // CSV Cols: SLAJD, OZNAKAE PODRUČJA, VODOTOK, MJERODAVNI VODOMJER, KRITERIJ ZA PROGLAŠENJE MJERA, RUKOVODITELJ, ZAMJENIK RUKOVODITELJA, ...
+                // Konverzija CSV zaglavlja: 
+                // "OZNAKAE PODRUČJA" -> "OZNAKA PODRUČJA" (kako je korisnik tražio promjenu u čitanju ili pretpostavka da je CSV ispravljen)
+                // Ako CSV i dalje šalje "OZNAKAE", trebamo provjeriti oboje za sigurnost, ili se prebaciti na novo.
+                // Pretpostavit ćemo da se stupac u CSV-u sada zove "OZNAKA PODRUČJA" ili ćemo podržati oboje.
 
-                // Map columns
-                const oznaka = row['OZNAKAE PODRUČJA']; // Note user provided typo "OZNAKAE"
+                const oznaka = row['OZNAKA PODRUČJA'] || row['OZNAKAE PODRUČJA'];
                 const vodotok = row['VODOTOK'];
 
                 // Skip invalid rows
@@ -127,8 +163,15 @@
 
                 const postaja = row['MJERODAVNI VODOMJER'] || "";
                 const kriterij = row['KRITERIJ ZA PROGLAŠENJE MJERA'] || "";
+
                 const rukovoditelj = row['RUKOVODITELJ'] || "";
                 const zamjenik = row['ZAMJENIK RUKOVODITELJA'] || "";
+
+                const vodocuvari = row['VODOČUVARI'] || "";
+
+                // Status dionice, ako postoji
+                const statusText = row['STATUS'] || "";
+                const statusClass = getStatusClass(statusText);
 
                 const tr = document.createElement('tr');
 
@@ -137,17 +180,21 @@
           <div class="station dionica-code">${oznaka}</div>
           <div class="station__dionica vodotok-name">${vodotok}</div>
         </td>
+        <td class="text-left">
+             ${statusText ? `<span class="status ${statusClass}">${statusText}</span>` : ''}
+        </td>
         <td>
           <strong class="postaja-name">${postaja}</strong>
         </td>
         <td>
           <span class="kriterij-text">${kriterij}</span>
         </td>
-        <td class="person-name">
-          ${rukovoditelj}
+        <td class="person-lead">
+          <div>${rukovoditelj}</div>
+          ${zamjenik ? `<div class="person-sub" style="margin-top: 0.4rem; color: var(--text-muted);">${zamjenik}</div>` : ''}
         </td>
-        <td class="person-name">
-          ${zamjenik}
+        <td class="person-sub">
+            ${vodocuvari}
         </td>
       `;
                 tbody.appendChild(tr);
