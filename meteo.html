@@ -24,30 +24,30 @@
 
         <!-- CONTENT -->
         <main class="content">
-            <table class="table" style="font-size: 0.85rem;">
+            <table class="table table--compact">
                 <thead>
                     <tr>
-                        <th rowspan="2">Lokacija</th>
-                        <th rowspan="2" class="text-center">Datum/Vrijeme</th>
+                        <th rowspan="2" class="meteo-col-location">Lokacija</th>
+                        <th rowspan="2" class="text-center meteo-col-datetime">Datum/Vrijeme</th>
                         <th colspan="3" class="text-center">Temperatura (°C)</th>
                         <th colspan="3" class="text-center">Vjetar (m/s)</th>
-                        <th rowspan="2" class="text-center">Tlak (hPa)</th>
-                        <th rowspan="2" class="text-center">Vlaga (%)</th>
+                        <th rowspan="2" class="text-center meteo-col-narrow">Tlak (hPa)</th>
+                        <th rowspan="2" class="text-center meteo-col-narrow">Vlaga (%)</th>
                         <th colspan="3" class="text-center">Oborina (mm)</th>
                     </tr>
                     <tr>
                         <!-- Temp subheaders -->
-                        <th class="text-center">Trenutna</th>
-                        <th class="text-center">Min</th>
-                        <th class="text-center">Max</th>
+                        <th class="text-center meteo-col-narrow">Trenutna</th>
+                        <th class="text-center meteo-col-extra-narrow">Min</th>
+                        <th class="text-center meteo-col-extra-narrow">Max</th>
                         <!-- Wind subheaders -->
-                        <th class="text-center">Smjer</th>
-                        <th class="text-center">Brzina</th>
-                        <th class="text-center">Udari</th>
+                        <th class="text-center meteo-col-extra-narrow">Smjer</th>
+                        <th class="text-center meteo-col-narrow">Brzina</th>
+                        <th class="text-center meteo-col-narrow">Udari</th>
                         <!-- Rain subheaders -->
-                        <th class="text-center">Satna</th>
-                        <th class="text-center">Dnevna</th>
-                        <th class="text-center">Mjes.</th>
+                        <th class="text-center meteo-col-extra-narrow">Satna</th>
+                        <th class="text-center meteo-col-narrow">Dnevna</th>
+                        <th class="text-center meteo-col-extra-narrow">Mjes.</th>
                     </tr>
                 </thead>
 
@@ -125,7 +125,7 @@
                 const tr = document.createElement('tr');
 
                 tr.innerHTML = `
-        <td style="font-weight:600; font-size:1.6rem;">
+        <td class="meteo-location">
           ${lokacija}
         </td>
         <td class="text-center">
@@ -133,23 +133,23 @@
         </td>
         
         <!-- Temp -->
-        <td class="text-center" style="font-size:1.7rem; font-weight:bold;">${temp}</td>
-        <td class="text-center" style="color:#8ecae6; font-size:1.2rem;">${tempMin}</td>
-        <td class="text-center" style="color:#e9c46a; font-size:1.2rem;">${tempMax}</td>
+        <td class="text-center meteo-temp-current">${temp}</td>
+        <td class="text-center meteo-temp-min">${tempMin}</td>
+        <td class="text-center meteo-temp-max">${tempMax}</td>
 
         <!-- Wind -->
-        <td class="text-center" style="font-size:1.1rem;">${vjetarSmjer}</td>
-        <td class="text-center" style="font-size:1.7rem; font-weight:bold;">${vjetarBrzina}</td>
-        <td class="text-center" style="color:#e76f51; font-size:1.2rem;">${vjetarUdari}</td>
+        <td class="text-center meteo-wind-direction">${vjetarSmjer}</td>
+        <td class="text-center meteo-wind-speed">${vjetarBrzina}</td>
+        <td class="text-center meteo-wind-gust">${vjetarUdari}</td>
 
         <!-- Pressure/Humidity -->
-        <td class="text-center" style="font-size:1.2rem;">${tlak}</td>
-        <td class="text-center" style="font-weight:bold; font-size:1.7rem;">${vlaga}</td>
+        <td class="text-center meteo-pressure">${tlak}</td>
+        <td class="text-center meteo-humidity">${vlaga}</td>
 
         <!-- Rain -->
-        <td class="text-center" style="font-size:1.2rem;">${oborinaSat}</td>
-        <td class="text-center" style="font-size:1.7rem; font-weight:bold;">${oborinaDan}</td>
-        <td class="text-center" style="font-size:1.2rem;">${oborinaMjesec}</td>
+        <td class="text-center meteo-rain">${oborinaSat}</td>
+        <td class="text-center meteo-rain-daily">${oborinaDan}</td>
+        <td class="text-center meteo-rain">${oborinaMjesec}</td>
       `;
                 tbody.appendChild(tr);
             });
