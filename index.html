@@ -14,6 +14,16 @@
 
 <body>
   <div class="app">
+    <!-- Global Error Overlay -->
+    <div id="globalError" class="state-container" style="display: none; z-index: 1000; background: var(--bg-main);">
+      <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+      <div class="state-title">Greška u inicijalizaciji</div>
+      <div class="state-desc" id="globalErrorMsg">Nije moguće učitati konfiguraciju.</div>
+      <button class="btn-retry" onclick="location.reload()">Pokušaj ponovno</button>
+    </div>
 
     <header class="header">
       <div>
@@ -251,7 +261,10 @@
 
       } catch (error) {
         console.error("Failed to load config.json", error);
-        label.textContent = "GREŠKA: Nije moguće učitati konfiguraciju.";
+        // Show global error
+        document.getElementById('globalError').style.display = 'block';
+        document.getElementById('globalErrorMsg').textContent = "Nije moguće učitati konfiguraciju (config.json).";
+        label.textContent = "GREŠKA";
       }
     }
 

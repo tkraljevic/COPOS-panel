@@ -496,3 +496,69 @@ body {
 }
 
 /* For very compact columns */
+
+/* ================================
+   LOADING & ERROR STATES
+================================ */
+
+.state-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--bg-surface-alt);
+  border-top-color: var(--status-normal);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1.5rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-icon {
+  width: 64px;
+  height: 64px;
+  color: var(--status-redovna);
+  margin-bottom: 1rem;
+}
+
+.state-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.state-desc {
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.btn-retry {
+  margin-top: 1.5rem;
+  padding: 0.8rem 1.6rem;
+  background: var(--bg-surface-alt);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-retry:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.content.hidden {
+  display: none;
+}

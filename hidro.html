@@ -24,7 +24,24 @@
 
         <!-- CONTENT -->
         <main class="content">
-            <table class="table">
+            <!-- Loading State -->
+            <div id="loadingState" class="state-container">
+                <div class="spinner"></div>
+                <div class="state-title">Učitavanje podataka...</div>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="state-container" style="display: none;">
+                <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div class="state-title">Greška</div>
+                <div class="state-desc" id="errorMsg">Nije moguće dohvatiti podatke.</div>
+                <button class="btn-retry" onclick="loadData()">Pokušaj ponovno</button>
+            </div>
+
+            <table class="table" id="dataTable" style="display: none;">
                 <thead>
                     <tr>
                         <th>Postaja</th>
@@ -88,14 +105,25 @@
         }
 
         async function loadData() {
+            const loading = document.getElementById('loadingState');
+            const error = document.getElementById('errorState');
+            const table = document.getElementById('dataTable');
+
             try {
+                // Show loading
+                loading.style.display = 'block';
+                error.style.display = 'none';
+                table.style.display = 'none';
+
                 // Fetch config first
                 const configResponse = await fetch('config.json?t=' + Date.now());
+                if (!configResponse.ok) throw new Error("Ne mogu učitati konfiguraciju");
                 const config = await configResponse.json();
                 const csvUrl = config.dataSources.hidro;
 
                 // Fetch directly from Google Sheets
                 const response = await fetch(csvUrl + '&t=' + Date.now());
+                if (!response.ok) throw new Error("Ne mogu dohvatiti podatke (Google Sheets)");
                 const text = await response.text();
                 const data = parseCSV(text);
 
@@ -114,8 +142,15 @@
                     document.getElementById('pageTitle').textContent = title;
                 }
 
+                // Show data
+                loading.style.display = 'none';
+                table.style.display = 'table';
+
             } catch (e) {
                 console.error("Error loading data:", e);
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                document.getElementById('errorMsg').textContent = e.message || "Provjerite internetsku vezu.";
             }
         }
 
