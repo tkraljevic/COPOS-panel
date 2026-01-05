@@ -49,7 +49,7 @@
                         <th class="th--w-15">Mjerodavna Postaja</th>
                         <th class="th--w-15">Kriterij</th>
                         <th class="th--w-20">Rukovoditelj / Zamjenik</th>
-                        <th class="th--w-10">Vodočuvari</th>
+                        <th class="th--w-10 text-left">Vodočuvari</th>
                     </tr>
                 </thead>
 
@@ -193,7 +193,7 @@
           <div>${rukovoditelj}</div>
           ${zamjenik ? `<div class="person-sub" style="margin-top: 0.4rem; color: var(--text-muted);">${zamjenik}</div>` : ''}
         </td>
-        <td class="person-sub">
+        <td class="person-sub text-left">
             ${vodocuvari}
         </td>
       `;
