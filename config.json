@@ -1,0 +1,149 @@
+{
+    "app": {
+        "title": "CENTAR OBRANE OD POPLAVA – OSIJEK",
+        "subtitle": "INFO PANEL",
+        "refreshInterval": 60000
+    },
+    "rotation": {
+        "defaultDuration": 12000,
+        "slides": [
+            {
+                "src": "hidro.html?id=1",
+                "label": "VODOSTAJI - 1"
+            },
+            {
+                "src": "hidro.html?id=2",
+                "label": "VODOSTAJI - 2"
+            },
+            {
+                "src": "meteo.html?id=1",
+                "label": "Meteo Podaci - 1"
+            },
+            {
+                "src": "meteo.html?id=2",
+                "label": "Meteo Podaci - 2"
+            },
+            {
+                "src": "meteo.html?id=3",
+                "label": "Meteo Podaci - 3"
+            },
+            {
+                "src": "meteo.html?id=4",
+                "label": "Meteo Podaci - 4"
+            },
+            {
+                "src": "meteo.html?id=5",
+                "label": "Meteo Podaci - 5"
+            },
+            {
+                "src": "dionice.html?id=1",
+                "label": "Status Dionica - 1"
+            },
+            {
+                "src": "dionice.html?id=2",
+                "label": "Status Dionica - 2"
+            },
+            {
+                "src": "dionice.html?id=3",
+                "label": "Status Dionica - 3"
+            },
+            {
+                "src": "dionice.html?id=4",
+                "label": "Status Dionica - 4"
+            },
+            {
+                "src": "dionice.html?id=5",
+                "label": "Status Dionica - 5"
+            },
+            {
+                "src": "dionice.html?id=6",
+                "label": "Status Dionica - 6"
+            },
+            {
+                "src": "dionice.html?id=7",
+                "label": "Status Dionica - 7"
+            },
+            {
+                "src": "dionice.html?id=8",
+                "label": "Status Dionica - 8"
+            },
+            {
+                "src": "dionice.html?id=9",
+                "label": "Status Dionica - 9"
+            },
+            {
+                "src": "dionice.html?id=10",
+                "label": "Status Dionica - 10"
+            },
+            {
+                "src": "dionice.html?id=11",
+                "label": "Status Dionica - 11"
+            },
+            {
+                "src": "dionice.html?id=12",
+                "label": "Status Dionica - 12"
+            },
+            {
+                "src": "dionice.html?id=13",
+                "label": "Status Dionica - 13"
+            },
+            {
+                "src": "dionice.html?id=14",
+                "label": "Status Dionica - 14"
+            },
+            {
+                "src": "dionice.html?id=15",
+                "label": "Status Dionica - 15"
+            },
+            {
+                "src": "dionice.html?id=16",
+                "label": "Status Dionica - 16"
+            },
+            {
+                "src": "dionice.html?id=17",
+                "label": "Status Dionica - 17"
+            },
+            {
+                "src": "dionice.html?id=18",
+                "label": "Status Dionica - 18"
+            },
+            {
+                "src": "dionice.html?id=19",
+                "label": "Status Dionica - 19"
+            },
+            {
+                "src": "dionice.html?id=20",
+                "label": "Status Dionica - 20"
+            },
+            {
+                "src": "dionice.html?id=21",
+                "label": "Status Dionica - 21"
+            },
+            {
+                "src": "dionice.html?id=22",
+                "label": "Status Dionica - 22"
+            },
+            {
+                "src": "dionice.html?id=23",
+                "label": "Status Dionica - 23"
+            },
+            {
+                "src": "dionice.html?id=24",
+                "label": "Status Dionica - 24"
+            },
+            {
+                "src": "dionice.html?id=25",
+                "label": "Status Dionica - 25"
+            },
+            {
+                "src": "dionice.html?id=26",
+                "label": "Status Dionica - 26"
+            }
+        ]
+    },
+    "dataSources": {
+        "hidro": "https://docs.google.com/spreadsheets/d/1LcHVJVuSduu9fOkGEIObntiJAKp9GJxHb64YLGca3eA/export?format=csv",
+        "meteo": "https://docs.google.com/spreadsheets/d/1SMKafklxgTvlkGy6alb389yPcCw09wQ3oMtJqTRsWk4/export?format=csv",
+        "dionice": "https://docs.google.com/spreadsheets/d/1dGOlyKtqBZ1wYYUTehxvPDwkNrTJ0V9KLSdRzyX0JYc/export?format=csv"
+    }
+}

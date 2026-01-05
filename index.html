@@ -79,43 +79,8 @@
     /* ================================
        ROTACIJA SLAJDOVA
     ================================ */
-    const slides = [
-      { src: "hidro.html?id=1", label: "VODOSTAJI - 1" },
-      { src: "hidro.html?id=2", label: "VODOSTAJI - 2" },
-      { src: "meteo.html?id=1", label: "Meteo Podaci - 1" },
-      { src: "meteo.html?id=2", label: "Meteo Podaci - 2" },
-      { src: "meteo.html?id=3", label: "Meteo Podaci - 3" },
-      { src: "meteo.html?id=4", label: "Meteo Podaci - 4" },
-      { src: "meteo.html?id=5", label: "Meteo Podaci - 5" },
-      { src: "dionice.html?id=1", label: "Status Dionica - 1" },
-      { src: "dionice.html?id=2", label: "Status Dionica - 2" },
-      { src: "dionice.html?id=3", label: "Status Dionica - 3" },
-      { src: "dionice.html?id=4", label: "Status Dionica - 4" },
-      { src: "dionice.html?id=5", label: "Status Dionica - 5" },
-      { src: "dionice.html?id=6", label: "Status Dionica - 6" },
-      { src: "dionice.html?id=7", label: "Status Dionica - 7" },
-      { src: "dionice.html?id=8", label: "Status Dionica - 8" },
-      { src: "dionice.html?id=9", label: "Status Dionica - 9" },
-      { src: "dionice.html?id=10", label: "Status Dionica - 10" },
-      { src: "dionice.html?id=11", label: "Status Dionica - 11" },
-      { src: "dionice.html?id=12", label: "Status Dionica - 12" },
-      { src: "dionice.html?id=13", label: "Status Dionica - 13" },
-      { src: "dionice.html?id=14", label: "Status Dionica - 14" },
-      { src: "dionice.html?id=15", label: "Status Dionica - 15" },
-      { src: "dionice.html?id=16", label: "Status Dionica - 16" },
-      { src: "dionice.html?id=17", label: "Status Dionica - 17" },
-      { src: "dionice.html?id=18", label: "Status Dionica - 18" },
-      { src: "dionice.html?id=19", label: "Status Dionica - 19" },
-      { src: "dionice.html?id=20", label: "Status Dionica - 20" },
-      { src: "dionice.html?id=21", label: "Status Dionica - 21" },
-      { src: "dionice.html?id=22", label: "Status Dionica - 22" },
-      { src: "dionice.html?id=23", label: "Status Dionica - 23" },
-      { src: "dionice.html?id=24", label: "Status Dionica - 24" },
-      { src: "dionice.html?id=25", label: "Status Dionica - 25" },
-      { src: "dionice.html?id=26", label: "Status Dionica - 26" }
-    ];
-
-    const rotationTime = 12000; // 12 sekundi
+    let slides = [];
+    let rotationTime = 12000; // 12 sekundi
     let currentSlide = 0;
     let rotationInterval = null;
     let progressAnimationFrame = null;
@@ -142,20 +107,31 @@
 
     // Učitaj slajd
     function loadSlide(index) {
+      if (slides.length === 0) return;
       currentSlide = index % slides.length;
+      const slide = slides[currentSlide];
 
-      frame.src = slides[currentSlide].src;
-      label.textContent = slides[currentSlide].label;
+      frame.src = slide.src;
+      label.textContent = slide.label;
       counter.textContent = `${currentSlide + 1} / ${slides.length}`;
+
+      // Odredi trajanje za ovaj slajd (override ako postoji u configu za taj slajd, inače default)
+      const duration = slide.duration || rotationTime;
 
       // Resetiraj progress bar
       bar.style.transition = "none";
       bar.style.width = "0%";
 
       if (!isPaused) {
-        void bar.offsetWidth; // Force reflow
-        bar.style.transition = `width ${rotationTime}ms linear`;
-        bar.style.width = "100%";
+        // Ponovno pokreni timer s novim trajanjem
+        if (rotationInterval) clearInterval(rotationInterval);
+        rotationInterval = setInterval(nextSlide, duration);
+
+        // Animiraj progress bar
+        requestAnimationFrame(() => {
+          bar.style.transition = `width ${duration}ms linear`;
+          bar.style.width = "100%";
+        });
       }
     }
 
@@ -173,15 +149,23 @@
     function startRotation() {
       if (rotationInterval) clearInterval(rotationInterval);
 
-      rotationInterval = setInterval(nextSlide, rotationTime);
+      const slide = slides[currentSlide];
+      const duration = (slide && slide.duration) || rotationTime;
+
+      rotationInterval = setInterval(nextSlide, duration);
       isPaused = false;
 
       toggleBtn.innerHTML = ICON_PAUSE;
       toggleBtn.setAttribute("aria-label", "Pauziraj rotaciju");
       toggleBtn.setAttribute("title", "Pauziraj");
 
-      // Ponovno pokreni progress bar
-      loadSlide(currentSlide);
+      // Restart progress bar
+      bar.style.transition = "none";
+      bar.style.width = "0%";
+      requestAnimationFrame(() => {
+        bar.style.transition = `width ${duration}ms linear`;
+        bar.style.width = "100%";
+      });
     }
 
     // Zaustavi rotaciju
@@ -218,26 +202,18 @@
 
     document.getElementById("prevSlide").addEventListener("click", () => {
       previousSlide();
-      if (!isPaused) {
-        startRotation(); // Restartuj timer nakon ručne promjene
-      }
     });
 
     document.getElementById("nextSlide").addEventListener("click", () => {
       nextSlide();
-      if (!isPaused) {
-        startRotation(); // Restartuj timer nakon ručne promjene
-      }
     });
 
     // Keyboard shortcuts
     document.addEventListener("keydown", (e) => {
       if (e.key === "ArrowLeft") {
         previousSlide();
-        if (!isPaused) startRotation();
       } else if (e.key === "ArrowRight") {
         nextSlide();
-        if (!isPaused) startRotation();
       } else if (e.key === " " || e.key === "Spacebar") {
         e.preventDefault();
         toggleRotation();
@@ -245,8 +221,41 @@
     });
 
     // Inicijalizacija
-    loadSlide(0);
-    startRotation();
+    async function init() {
+      try {
+        const response = await fetch('config.json?t=' + Date.now());
+        const config = await response.json();
+
+        slides = config.rotation.slides;
+        rotationTime = config.rotation.defaultDuration || 12000;
+
+        // Update title if present
+        if (config.app) {
+          if (config.app.title) document.querySelector('.header__title').textContent = config.app.title;
+          if (config.app.subtitle) document.querySelector('.header__subtitle').textContent = config.app.subtitle;
+        }
+
+        console.log(`Loaded ${slides.length} slides from config.`);
+
+        loadSlide(0);
+        // Start automatically
+        // startRotation is called inside loadSlide logic mostly, but we trigger the first interval:
+        // Actually loadSlide handles bar animation, but we need to ensure interval calls nextSlide.
+        // Let's explicitly start it.
+        // Note: loadSlide doesn't start interval if isPaused is true.
+        // Intially isPaused is false.
+
+        // However, loadSlide logic above has: 
+        // if (!isPaused) { clearInterval; setInterval; }
+        // So calling loadSlide(0) will start the rotation if isPaused is false.
+
+      } catch (error) {
+        console.error("Failed to load config.json", error);
+        label.textContent = "GREŠKA: Nije moguće učitati konfiguraciju.";
+      }
+    }
+
+    init();
 
     // Debugging info (može se ukloniti u produkciji)
     console.log(`Rotacija pokrenuta: ${slides.length} slajdova × ${rotationTime / 1000}s = ${(slides.length * rotationTime) / 60000} min`);

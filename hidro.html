@@ -89,8 +89,13 @@
 
         async function loadData() {
             try {
+                // Fetch config first
+                const configResponse = await fetch('config.json?t=' + Date.now());
+                const config = await configResponse.json();
+                const csvUrl = config.dataSources.hidro;
+
                 // Fetch directly from Google Sheets
-                const response = await fetch('https://docs.google.com/spreadsheets/d/1LcHVJVuSduu9fOkGEIObntiJAKp9GJxHb64YLGca3eA/export?format=csv&t=' + Date.now());
+                const response = await fetch(csvUrl + '&t=' + Date.now());
                 const text = await response.text();
                 const data = parseCSV(text);
 
@@ -104,13 +109,9 @@
                 renderTable(filtered);
 
                 // Update Title/Footer if possible. 
-                // Since CSV doesn't explicitly have "Vodotok Name" for the whole slide, 
-                // we might infer it from the first row or just use generic "VODOTOK " + slideId
                 if (filtered.length > 0) {
-                    // Improve this if user provides mapping, for now:
                     const title = "HIDROLOŠKI PODACI";
                     document.getElementById('pageTitle').textContent = title;
-                    document.getElementById('footerLabel').textContent = title;
                 }
 
             } catch (e) {
