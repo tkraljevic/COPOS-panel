@@ -8,7 +8,6 @@
   <title>COPOS – Pregled vodostaja</title>
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Kiosk / fullscreen -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#0b1118">
 </head>
@@ -16,7 +15,6 @@
 <body>
   <div class="app">
 
-    <!-- HEADER -->
     <header class="header">
       <div>
         <div class="header__title">CENTAR OBRANE OD POPLAVA – OSIJEK</div>
@@ -26,32 +24,29 @@
       <div class="clock" id="clock">--:--:--</div>
     </header>
 
-    <!-- CONTENT -->
     <main class="content content--no-padding">
       <iframe id="slideFrame" src="hidro.html?id=1" class="iframe--fullscreen" loading="eager"></iframe>
     </main>
 
-    <!-- FOOTER -->
     <footer class="footer">
       <div>Izvor: Hrvatske vode / DHMZ / SHMU / OVF</div>
 
       <div class="rotation">
-        <button id="prevSlide" class="rotation__toggle" aria-label="Prethodni slajd">
+        <button id="prevSlide" class="rotation__toggle" aria-label="Prethodni slajd" title="Prethodni slajd">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
             <path d="M9 2L4 7L9 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round" fill="none" />
           </svg>
         </button>
 
-        <button id="rotationToggle" class="rotation__toggle" aria-label="Pauziraj rotaciju">
-          <!-- Default is Pause Icon (since it autoruns) -->
+        <button id="rotationToggle" class="rotation__toggle" aria-label="Pauziraj rotaciju" title="Pauziraj">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
             <rect x="2" y="1" width="4" height="12" rx="1" />
             <rect x="8" y="1" width="4" height="12" rx="1" />
           </svg>
         </button>
 
-        <button id="nextSlide" class="rotation__toggle" aria-label="Slijedeći slajd">
+        <button id="nextSlide" class="rotation__toggle" aria-label="Sljedeći slajd" title="Sljedeći slajd">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
             <path d="M5 2L10 7L5 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round" fill="none" />
@@ -64,7 +59,7 @@
           <div class="progress__bar" id="progressBar"></div>
         </div>
 
-        <span id="slideCounter">1 / ∞</span>
+        <span id="slideCounter">1 / 31</span>
       </div>
     </footer>
 
@@ -72,7 +67,7 @@
 
   <script>
     /* ================================
-       CLOCK
+       SAT
     ================================ */
     function updateClock() {
       document.getElementById("clock")
@@ -82,7 +77,7 @@
     setInterval(updateClock, 1000);
 
     /* ================================
-       SLIDE ROTATION
+       ROTACIJA SLAJDOVA
     ================================ */
     const slides = [
       { src: "hidro.html?id=1", label: "VODOSTAJI - 1" },
@@ -112,13 +107,20 @@
       { src: "dionice.html?id=18", label: "Status Dionica - 18" },
       { src: "dionice.html?id=19", label: "Status Dionica - 19" },
       { src: "dionice.html?id=20", label: "Status Dionica - 20" },
-      { src: "dionice.html?id=21", label: "Status Dionica - 21" }
+      { src: "dionice.html?id=21", label: "Status Dionica - 21" },
+      { src: "dionice.html?id=22", label: "Status Dionica - 22" },
+      { src: "dionice.html?id=23", label: "Status Dionica - 23" },
+      { src: "dionice.html?id=24", label: "Status Dionica - 24" },
+      { src: "dionice.html?id=25", label: "Status Dionica - 25" },
+      { src: "dionice.html?id=26", label: "Status Dionica - 26" }
     ];
 
-    const rotationTime = 12000; // 12000 = 12 sec.
+    const rotationTime = 12000; // 12 sekundi
     let currentSlide = 0;
     let rotationInterval = null;
+    let progressAnimationFrame = null;
     let isPaused = false;
+    let progressStartTime = null;
 
     const frame = document.getElementById("slideFrame");
     const label = document.getElementById("slideLabel");
@@ -126,7 +128,7 @@
     const bar = document.getElementById("progressBar");
     const toggleBtn = document.getElementById("rotationToggle");
 
-    // Icons
+    // SVG ikone
     const ICON_PAUSE = `
       <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
         <rect x="2" y="1" width="4" height="12" rx="1" />
@@ -138,64 +140,71 @@
         <path d="M3 2.5C3 1.6 4 1.1 4.8 1.6L12.3 6.1C13 6.5 13 7.5 12.3 7.9L4.8 12.4C4 12.9 3 12.4 3 11.5V2.5Z" />
       </svg>`;
 
+    // Učitaj slajd
     function loadSlide(index) {
-      frame.src = slides[index].src;
-      label.textContent = slides[index].label;
-      counter.textContent = `${index + 1} / ${slides.length}`; // Fixed the generic infinity symbol
+      currentSlide = index % slides.length;
 
-      // Reset animation
+      frame.src = slides[currentSlide].src;
+      label.textContent = slides[currentSlide].label;
+      counter.textContent = `${currentSlide + 1} / ${slides.length}`;
+
+      // Resetiraj progress bar
       bar.style.transition = "none";
       bar.style.width = "0%";
 
-      // Only start animation if not paused
       if (!isPaused) {
-        // Force reflow
-        void bar.offsetWidth;
+        void bar.offsetWidth; // Force reflow
         bar.style.transition = `width ${rotationTime}ms linear`;
         bar.style.width = "100%";
       }
     }
 
+    // Sljedeći slajd
     function nextSlide() {
-      currentSlide = (currentSlide + 1) % slides.length;
-      loadSlide(currentSlide);
+      loadSlide(currentSlide + 1);
     }
 
+    // Prethodni slajd
     function previousSlide() {
-      currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-      loadSlide(currentSlide);
+      loadSlide(currentSlide - 1 + slides.length);
     }
 
+    // Pokreni rotaciju
     function startRotation() {
       if (rotationInterval) clearInterval(rotationInterval);
+
       rotationInterval = setInterval(nextSlide, rotationTime);
       isPaused = false;
+
       toggleBtn.innerHTML = ICON_PAUSE;
       toggleBtn.setAttribute("aria-label", "Pauziraj rotaciju");
+      toggleBtn.setAttribute("title", "Pauziraj");
 
-      // Resume animation properly? 
-      // Actually simpler to just reload current slide to restart timer visual
-      // or just unfreeze. 
-      // For simplicity/robustness: restart the visual timer for the CURRENT slide duration.
-      // Ideally we'd resume from where we left off, but CSS transition doesn't support "pause" easily without complex steps.
-      // Re-loading the slide ensures the bar syncs with the new interval.
+      // Ponovno pokreni progress bar
       loadSlide(currentSlide);
     }
 
+    // Zaustavi rotaciju
     function stopRotation() {
-      if (rotationInterval) clearInterval(rotationInterval);
-      rotationInterval = null;
+      if (rotationInterval) {
+        clearInterval(rotationInterval);
+        rotationInterval = null;
+      }
+
       isPaused = true;
+
       toggleBtn.innerHTML = ICON_PLAY;
       toggleBtn.setAttribute("aria-label", "Pokreni rotaciju");
+      toggleBtn.setAttribute("title", "Pokreni");
 
-      // Freeze bar at current position
+      // Zamrzni progress bar na trenutnoj poziciji
       const computedStyle = window.getComputedStyle(bar);
       const width = computedStyle.getPropertyValue('width');
       bar.style.transition = "none";
       bar.style.width = width;
     }
 
+    // Toggle pauza/play
     function toggleRotation() {
       if (isPaused) {
         startRotation();
@@ -204,13 +213,43 @@
       }
     }
 
+    // Event listeneri
     toggleBtn.addEventListener("click", toggleRotation);
-    document.getElementById("prevSlide").addEventListener("click", previousSlide);
-    document.getElementById("nextSlide").addEventListener("click", nextSlide);
 
-    // Init
-    loadSlide(currentSlide);
+    document.getElementById("prevSlide").addEventListener("click", () => {
+      previousSlide();
+      if (!isPaused) {
+        startRotation(); // Restartuj timer nakon ručne promjene
+      }
+    });
+
+    document.getElementById("nextSlide").addEventListener("click", () => {
+      nextSlide();
+      if (!isPaused) {
+        startRotation(); // Restartuj timer nakon ručne promjene
+      }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") {
+        previousSlide();
+        if (!isPaused) startRotation();
+      } else if (e.key === "ArrowRight") {
+        nextSlide();
+        if (!isPaused) startRotation();
+      } else if (e.key === " " || e.key === "Spacebar") {
+        e.preventDefault();
+        toggleRotation();
+      }
+    });
+
+    // Inicijalizacija
+    loadSlide(0);
     startRotation();
+
+    // Debugging info (može se ukloniti u produkciji)
+    console.log(`Rotacija pokrenuta: ${slides.length} slajdova × ${rotationTime / 1000}s = ${(slides.length * rotationTime) / 60000} min`);
   </script>
 
 </body>
