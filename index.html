@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="hr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>COPOS – Pregled vodostaja</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Kiosk / fullscreen -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0b1118">
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div>
+        <div class="header__title">CENTAR OBRANE OD POPLAVA – OSIJEK</div>
+        <div class="header__subtitle">INFO PANEL</div>
+      </div>
+
+      <div class="clock" id="clock">--:--:--</div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content" style="padding:0;">
+      <iframe id="slideFrame" src="hidro.html?id=1" style="
+        width:100%;
+        height:100%;
+        border:none;
+      " loading="eager"></iframe>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div>Izvor: Hrvatske vode / DHMZ / SHMU / OVF</div>
+
+      <div class="rotation">
+        <button id="prevSlide" class="rotation__toggle" aria-label="Prethodni slajd">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+            <path d="M9 2L4 7L9 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" fill="none" />
+          </svg>
+        </button>
+
+        <button id="rotationToggle" class="rotation__toggle" aria-label="Pauziraj rotaciju">
+          <!-- Default is Pause Icon (since it autoruns) -->
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+            <rect x="2" y="1" width="4" height="12" rx="1" />
+            <rect x="8" y="1" width="4" height="12" rx="1" />
+          </svg>
+        </button>
+
+        <button id="nextSlide" class="rotation__toggle" aria-label="Slijedeći slajd">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+            <path d="M5 2L10 7L5 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" fill="none" />
+          </svg>
+        </button>
+
+        <span id="slideLabel">VODOTOK - POSTAJA</span>
+
+        <div class="progress">
+          <div class="progress__bar" id="progressBar"></div>
+        </div>
+
+        <span id="slideCounter">1 / ∞</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    /* ================================
+       CLOCK
+    ================================ */
+    function updateClock() {
+      document.getElementById("clock")
+        .textContent = new Date().toLocaleTimeString("hr-HR");
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    /* ================================
+       SLIDE ROTATION
+    ================================ */
+    const slides = [
+      { src: "hidro.html?id=1", label: "VODOSTAJI" },
+      { src: "hidro.html?id=2", label: "VODOSTAJI" },
+      { src: "meteo.html?id=1", label: "Meteo Podaci - 1" },
+      { src: "meteo.html?id=2", label: "Meteo Podaci - 2" },
+      { src: "meteo.html?id=3", label: "Meteo Podaci - 3" },
+      { src: "meteo.html?id=4", label: "Meteo Podaci - 4" },
+      { src: "meteo.html?id=5", label: "Meteo Podaci - 5" },
+      { src: "dionice.html?id=1", label: "Status Dionica - 1" },
+      { src: "dionice.html?id=2", label: "Status Dionica - 2" },
+      { src: "dionice.html?id=3", label: "Status Dionica - 3" },
+      { src: "dionice.html?id=4", label: "Status Dionica - 4" },
+      { src: "dionice.html?id=5", label: "Status Dionica - 5" },
+      { src: "dionice.html?id=6", label: "Status Dionica - 6" },
+      { src: "dionice.html?id=7", label: "Status Dionica - 7" },
+      { src: "dionice.html?id=8", label: "Status Dionica - 8" },
+      { src: "dionice.html?id=9", label: "Status Dionica - 9" },
+      { src: "dionice.html?id=10", label: "Status Dionica - 10" },
+      { src: "dionice.html?id=11", label: "Status Dionica - 11" },
+      { src: "dionice.html?id=12", label: "Status Dionica - 12" },
+      { src: "dionice.html?id=13", label: "Status Dionica - 13" },
+      { src: "dionice.html?id=14", label: "Status Dionica - 14" },
+      { src: "dionice.html?id=15", label: "Status Dionica - 15" },
+      { src: "dionice.html?id=16", label: "Status Dionica - 16" },
+      { src: "dionice.html?id=17", label: "Status Dionica - 17" },
+      { src: "dionice.html?id=18", label: "Status Dionica - 18" },
+      { src: "dionice.html?id=19", label: "Status Dionica - 19" },
+      { src: "dionice.html?id=20", label: "Status Dionica - 20" },
+      { src: "dionice.html?id=21", label: "Status Dionica - 21" }
+    ];
+
+    const rotationTime = 12000; // 12000 = 12 sec.
+    let currentSlide = 0;
+    let rotationInterval = null;
+    let isPaused = false;
+
+    const frame = document.getElementById("slideFrame");
+    const label = document.getElementById("slideLabel");
+    const counter = document.getElementById("slideCounter");
+    const bar = document.getElementById("progressBar");
+    const toggleBtn = document.getElementById("rotationToggle");
+
+    // Icons
+    const ICON_PAUSE = `
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+        <rect x="2" y="1" width="4" height="12" rx="1" />
+        <rect x="8" y="1" width="4" height="12" rx="1" />
+      </svg>`;
+
+    const ICON_PLAY = `
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" style="transform: translateX(1px);">
+        <path d="M3 2.5C3 1.6 4 1.1 4.8 1.6L12.3 6.1C13 6.5 13 7.5 12.3 7.9L4.8 12.4C4 12.9 3 12.4 3 11.5V2.5Z" />
+      </svg>`;
+
+    function loadSlide(index) {
+      frame.src = slides[index].src;
+      label.textContent = slides[index].label;
+      counter.textContent = `${index + 1} / ${slides.length}`; // Fixed the generic infinity symbol
+
+      // Reset animation
+      bar.style.transition = "none";
+      bar.style.width = "0%";
+
+      // Only start animation if not paused
+      if (!isPaused) {
+        // Force reflow
+        void bar.offsetWidth;
+        bar.style.transition = `width ${rotationTime}ms linear`;
+        bar.style.width = "100%";
+      }
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % slides.length;
+      loadSlide(currentSlide);
+    }
+
+    function previousSlide() {
+      currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+      loadSlide(currentSlide);
+    }
+
+    function startRotation() {
+      if (rotationInterval) clearInterval(rotationInterval);
+      rotationInterval = setInterval(nextSlide, rotationTime);
+      isPaused = false;
+      toggleBtn.innerHTML = ICON_PAUSE;
+      toggleBtn.setAttribute("aria-label", "Pauziraj rotaciju");
+
+      // Resume animation properly? 
+      // Actually simpler to just reload current slide to restart timer visual
+      // or just unfreeze. 
+      // For simplicity/robustness: restart the visual timer for the CURRENT slide duration.
+      // Ideally we'd resume from where we left off, but CSS transition doesn't support "pause" easily without complex steps.
+      // Re-loading the slide ensures the bar syncs with the new interval.
+      loadSlide(currentSlide);
+    }
+
+    function stopRotation() {
+      if (rotationInterval) clearInterval(rotationInterval);
+      rotationInterval = null;
+      isPaused = true;
+      toggleBtn.innerHTML = ICON_PLAY;
+      toggleBtn.setAttribute("aria-label", "Pokreni rotaciju");
+
+      // Freeze bar at current position
+      const computedStyle = window.getComputedStyle(bar);
+      const width = computedStyle.getPropertyValue('width');
+      bar.style.transition = "none";
+      bar.style.width = width;
+    }
+
+    function toggleRotation() {
+      if (isPaused) {
+        startRotation();
+      } else {
+        stopRotation();
+      }
+    }
+
+    toggleBtn.addEventListener("click", toggleRotation);
+    document.getElementById("prevSlide").addEventListener("click", previousSlide);
+    document.getElementById("nextSlide").addEventListener("click", nextSlide);
+
+    // Init
+    loadSlide(currentSlide);
+    startRotation();
+  </script>
+
+</body>
+
+</html>

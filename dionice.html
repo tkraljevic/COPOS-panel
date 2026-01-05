@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="hr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="refresh" content="3600" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>COPOS – Status Dionica</title>
+    <link rel="stylesheet" href="style.css" />
+    <meta name="theme-color" content="#0b1118">
+</head>
+
+<body>
+    <div class="app">
+
+        <!-- HEADER -->
+        <header class="header">
+            <div>
+                <div class="header__title">STATUS DIONICA</div>
+                <div class="header__subtitle">Pregled branjenih dionica i odgovornih osoba</div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <main class="content">
+            <table class="table" style="font-size: 0.85rem;">
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">Dionica / Vodotok</th>
+                        <th style="width: 20%;">Mjerodavna Postaja</th>
+                        <th style="width: 15%;">Kriterij</th>
+                        <th style="width: 17%;">Rukovoditelj</th>
+                        <th style="width: 18%;">Zamjenik</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tableBody">
+                    <!-- Rows will be populated by JS -->
+                </tbody>
+            </table>
+        </main>
+
+
+
+    </div>
+
+    <script src="js/csv-parser.js"></script>
+    <script>
+        async function loadData() {
+            try {
+                // Fetch directly from Google Sheets
+                // URL provided: https://docs.google.com/spreadsheets/d/1dGOlyKtqBZ1wYYUTehxvPDwkNrTJ0V9KLSdRzyX0JYc/export?format=csv
+                const response = await fetch('https://docs.google.com/spreadsheets/d/1dGOlyKtqBZ1wYYUTehxvPDwkNrTJ0V9KLSdRzyX0JYc/export?format=csv&t=' + Date.now());
+                const text = await response.text();
+                const data = parseCSV(text);
+
+                // Get Slide ID from URL (consistent with meteo.html)
+                const urlParams = new URLSearchParams(window.location.search);
+                const slideId = urlParams.get('id');
+
+                // Filter data if slideId is present
+                let filtered = data;
+                if (slideId) {
+                    filtered = data.filter(row => row.SLAJD === slideId);
+                }
+
+                renderTable(filtered);
+            } catch (e) {
+                console.error("Error loading data:", e);
+            }
+        }
+
+        function renderTable(rows) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = "";
+
+            rows.forEach(row => {
+                // CSV Cols: SLAJD, OZNAKAE PODRUČJA, VODOTOK, MJERODAVNI VODOMJER, KRITERIJ ZA PROGLAŠENJE MJERA, RUKOVODITELJ, ZAMJENIK RUKOVODITELJA, ...
+
+                // Map columns
+                const oznaka = row['OZNAKAE PODRUČJA']; // Note user provided typo "OZNAKAE"
+                const vodotok = row['VODOTOK'];
+
+                // Skip invalid rows
+                if (!oznaka && !vodotok) return;
+
+                const postaja = row['MJERODAVNI VODOMJER'] || "";
+                const kriterij = row['KRITERIJ ZA PROGLAŠENJE MJERA'] || "";
+                const rukovoditelj = row['RUKOVODITELJ'] || "";
+                const zamjenik = row['ZAMJENIK RUKOVODITELJA'] || "";
+
+                const tr = document.createElement('tr');
+
+                tr.innerHTML = `
+        <td>
+          <div class="station" style="font-size:1.1rem;">${oznaka}</div>
+          <div class="station__dionica" style="white-space: pre-wrap;">${vodotok}</div>
+        </td>
+        <td>
+          <strong style="display:block;">${postaja}</strong>
+        </td>
+        <td>
+          <span style="color:var(--text-muted); font-size:0.8rem; white-space: pre-wrap; display:block;">${kriterij}</span>
+        </td>
+        <td style="font-size:0.9rem;">
+          ${rukovoditelj}
+        </td>
+        <td style="font-size:0.9rem;">
+          ${zamjenik}
+        </td>
+      `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        loadData();
+        setInterval(loadData, 60000); 
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="hr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="refresh" content="3600" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>COPOS – Meteo Podaci</title>
+    <link rel="stylesheet" href="style.css" />
+    <meta name="theme-color" content="#0b1118">
+</head>
+
+<body>
+    <div class="app">
+
+        <!-- HEADER -->
+        <header class="header">
+            <div>
+                <div class="header__title">METEOROLOŠKI PODACI</div>
+                <div class="header__subtitle">Trenutno stanje na postajama</div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <main class="content">
+            <table class="table" style="font-size: 0.85rem;">
+                <thead>
+                    <tr>
+                        <th rowspan="2">Lokacija</th>
+                        <th rowspan="2" class="text-center">Datum/Vrijeme</th>
+                        <th colspan="3" class="text-center">Temperatura (°C)</th>
+                        <th colspan="3" class="text-center">Vjetar (m/s)</th>
+                        <th rowspan="2" class="text-center">Tlak (hPa)</th>
+                        <th rowspan="2" class="text-center">Vlaga (%)</th>
+                        <th colspan="3" class="text-center">Oborina (mm)</th>
+                    </tr>
+                    <tr>
+                        <!-- Temp subheaders -->
+                        <th class="text-center">Trenutna</th>
+                        <th class="text-center">Min</th>
+                        <th class="text-center">Max</th>
+                        <!-- Wind subheaders -->
+                        <th class="text-center">Smjer</th>
+                        <th class="text-center">Brzina</th>
+                        <th class="text-center">Udari</th>
+                        <!-- Rain subheaders -->
+                        <th class="text-center">Satna</th>
+                        <th class="text-center">Dnevna</th>
+                        <th class="text-center">Mjes.</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tableBody">
+                    <!-- Rows will be populated by JS -->
+                </tbody>
+            </table>
+        </main>
+
+
+
+    </div>
+
+    <script src="js/csv-parser.js"></script>
+    <script>
+        async function loadData() {
+            try {
+                // Fetch directly from Google Sheets
+                // URL provided: https://docs.google.com/spreadsheets/d/1SMKafklxgTvlkGy6alb389yPcCw09wQ3oMtJqTRsWk4/export?format=csv
+                const response = await fetch('https://docs.google.com/spreadsheets/d/1SMKafklxgTvlkGy6alb389yPcCw09wQ3oMtJqTRsWk4/export?format=csv&t=' + Date.now());
+                const text = await response.text();
+                const data = parseCSV(text);
+
+                // Get Slide ID from URL (consistent with hidro.html)
+                const urlParams = new URLSearchParams(window.location.search);
+                const slideId = urlParams.get('id');
+
+                // Filter data if slideId is present
+                // If slideId is null, we might show all or nothing. 
+                // Based on hidro.html pattern, we assume it's used with ?id=...
+                // If no id, let's just show everything or let the filter pass if SLAJD matches.
+
+                let filtered = data;
+                if (slideId) {
+                    filtered = data.filter(row => row.SLAJD === slideId);
+                }
+
+                renderTable(filtered);
+            } catch (e) {
+                console.error("Error loading data:", e);
+            }
+        }
+
+        function renderTable(rows) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = "";
+
+            rows.forEach(row => {
+                // CSV Cols: SLAJD,LOKACIJA,DATUM,VRIJEME,TEMPERATURA ZRAKA C°,MIN TEMP. C°,MAX TEMP. C°,SMJER VJETRA,VJETAR [m/s],MAX UDARI VJETRA [m/s],TLAK ZRAKA [hPa],VLAGA [%],SATNA OBORINA [mm],DNEVNA OBORINA [mm],MJESEČNA OBORINA [mm]
+
+                // Map columns
+                const lokacija = row['LOKACIJA'];
+                // Skip rows without valid location or temperature (header rows in body)
+                if (!lokacija || !row['TEMPERATURA ZRAKA C°']) return;
+
+                const datum = row['DATUM'] || "";
+                const vrijeme = row['VRIJEME'] || "";
+
+                const temp = row['TEMPERATURA ZRAKA C°'] || "-";
+                const tempMin = row['MIN TEMP. C°'] || "-";
+                const tempMax = row['MAX TEMP. C°'] || "-";
+
+                const vjetarSmjer = row['SMJER VJETRA'] || "";
+                const vjetarBrzina = row['VJETAR [m/s]'] || "-";
+                const vjetarUdari = row['MAX UDARI VJETRA [m/s]'] || "-";
+
+                const tlak = row['TLAK ZRAKA [hPa]'] || "-";
+                const vlaga = row['VLAGA [%]'] || "-";
+
+                const oborinaSat = row['SATNA OBORINA [mm]'] || "-";
+                const oborinaDan = row['DNEVNA OBORINA [mm]'] || "-";
+                const oborinaMjesec = row['MJESEČNA OBORINA [mm]'] || "-";
+
+
+                const tr = document.createElement('tr');
+
+                tr.innerHTML = `
+        <td style="font-weight:600; font-size:1.1rem;">
+          ${lokacija}
+        </td>
+        <td class="text-center">
+          ${datum}<br>${vrijeme}
+        </td>
+        
+        <!-- Temp -->
+        <td class="text-center" style="font-size:1.2rem; font-weight:bold;">${temp}</td>
+        <td class="text-center" style="color:#8ecae6;">${tempMin}</td>
+        <td class="text-center" style="color:#e9c46a;">${tempMax}</td>
+
+        <!-- Wind -->
+        <td class="text-center">${vjetarSmjer}</td>
+        <td class="text-center">${vjetarBrzina}</td>
+        <td class="text-center" style="color:#e76f51;">${vjetarUdari}</td>
+
+        <!-- Pressure/Humidity -->
+        <td class="text-center">${tlak}</td>
+        <td class="text-center" style="font-weight:bold;">${vlaga}</td>
+
+        <!-- Rain -->
+        <td class="text-center">${oborinaSat}</td>
+        <td class="text-center">${oborinaDan}</td>
+        <td class="text-center">${oborinaMjesec}</td>
+      `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        loadData();
+        setInterval(loadData, 60000); // 1 min refresh
+    </script>
+</body>
+
+</html>
