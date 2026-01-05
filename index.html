@@ -76,34 +76,33 @@
   </div>
 
   <script>
-    /* ================================
-       SAT
-    ================================ */
-    function updateClock() {
-      document.getElementById("clock")
-        .textContent = new Date().toLocaleTimeString("hr-HR");
-    }
-    updateClock();
-    setInterval(updateClock, 1000);
+    /* ==========================================================================
+       GLAVNA SKRIPTA ZA UPRAVLJANJE APLIKACIJOM
+       
+       Ovaj dio koda upravlja rotacijom slajdova, satom i učitavanjem postavki.
+       Koristimo "Vanilla JavaScript" (čisti JS bez frameworka) jer je brži
+       i jednostavniji za ovakve projekte.
+    ========================================================================== */
 
-    /* ================================
-       ROTACIJA SLAJDOVA
-    ================================ */
-    let slides = [];
-    let rotationTime = 12000; // 12 sekundi
-    let currentSlide = 0;
-    let rotationInterval = null;
-    let progressAnimationFrame = null;
-    let isPaused = false;
-    let progressStartTime = null;
+    /* --------------------------------------------------------------------------
+       1. DEFINICIJA VARIJABLI (Stanje aplikacije)
+       Ovdje pamtimo trenutno stanje: koji je slajd prikazan, je li pauzirano itd.
+    -------------------------------------------------------------------------- */
+    let slides = [];              // Lista slajdova koju ćemo učitati iz config.json
+    let rotationTime = 12000;     // Zadano vrijeme trajanja slajda u milisekundama (12s)
+    let currentSlide = 0;         // Indeks trenutnog slajda (kreće od 0)
+    let rotationInterval = null;  // Varijabla koja čuva referencu na timer za rotaciju
+    let isPaused = false;         // Zastavica: true ako je korisnik pauzirao rotaciju
 
-    const frame = document.getElementById("slideFrame");
-    const label = document.getElementById("slideLabel");
-    const counter = document.getElementById("slideCounter");
-    const bar = document.getElementById("progressBar");
-    const toggleBtn = document.getElementById("rotationToggle");
+    // Dohvaćamo HTML elemente s kojima ćemo manipulirati
+    // const (konstanta) koristimo jer se referenca na element neće mijenjati
+    const frame = document.getElementById("slideFrame");       // Iframe u kojem se prikazuje sadržaj
+    const label = document.getElementById("slideLabel");       // Naslov slajda u footeru
+    const counter = document.getElementById("slideCounter");   // Brojač (npr. 1 / 10)
+    const bar = document.getElementById("progressBar");        // Linija koja pokazuje napredak
+    const toggleBtn = document.getElementById("rotationToggle"); // Gumb za pauzu/start
 
-    // SVG ikone
+    // Definiramo SVG ikone kao stringove kako ne bismo morali imati vanjske slike
     const ICON_PAUSE = `
       <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
         <rect x="2" y="1" width="4" height="12" rx="1" />
@@ -115,61 +114,98 @@
         <path d="M3 2.5C3 1.6 4 1.1 4.8 1.6L12.3 6.1C13 6.5 13 7.5 12.3 7.9L4.8 12.4C4 12.9 3 12.4 3 11.5V2.5Z" />
       </svg>`;
 
-    // Učitaj slajd
+    /* --------------------------------------------------------------------------
+       2. FUNKCIJE ZA SAT
+       Osvježava sat svake sekunde.
+    -------------------------------------------------------------------------- */
+    function updateClock() {
+      // Dohvaćamo trenutno vrijeme i formatiramo ga na hrvatski način (hr-HR)
+      document.getElementById("clock")
+        .textContent = new Date().toLocaleTimeString("hr-HR");
+    }
+    updateClock(); // Pozovi odmah jedanput
+    setInterval(updateClock, 1000); // I onda ponavljaj svake sekunde (1000 ms)
+
+
+    /* --------------------------------------------------------------------------
+       3. FUNKCIJE ZA ROTACIJU SLAJDOVA
+       Glavna logika za prebacivanje sadržaja u iframe-u.
+    -------------------------------------------------------------------------- */
+
+    /**
+     * Učitava i prikazuje određeni slajd.
+     * @param {number} index - Redni broj slajda koji želimo prikazati
+     */
     function loadSlide(index) {
-      if (slides.length === 0) return;
+      if (slides.length === 0) return; // Ako nema slajdova, ne radi ništa
+
+      // Koristimo modul operator (%) za kružnu rotaciju.
+      // Primjer: ako imamo 5 slajdova, a tražimo 6. slajd (index 5), 
+      // 5 % 5 = 0, pa se vraćamo na prvi slajd.
       currentSlide = index % slides.length;
+
       const slide = slides[currentSlide];
 
+      // Postavljamo izvor (src) iframe-a na novi URL i ažuriramo tekstove
       frame.src = slide.src;
       label.textContent = slide.label;
       counter.textContent = `${currentSlide + 1} / ${slides.length}`;
 
-      // Odredi trajanje za ovaj slajd (override ako postoji u configu za taj slajd, inače default)
+      // Provjeravamo ima li ovaj specifični slajd svoje trajanje u configu, 
+      // ako ne, koristi globalno zadano vrijeme.
       const duration = slide.duration || rotationTime;
 
-      // Resetiraj progress bar
-      bar.style.transition = "none";
+      // Resetiramo animaciju progress bara
+      bar.style.transition = "none"; // Isključi animaciju da se bar odmah vrati na 0
       bar.style.width = "0%";
 
+      // Ako rotacija nije pauzirana, pokrećemo novu animaciju i timer
       if (!isPaused) {
-        // Ponovno pokreni timer s novim trajanjem
+        // Restartiramo interval (timer) kako bi brojao od nule za novi slajd
         if (rotationInterval) clearInterval(rotationInterval);
         rotationInterval = setInterval(nextSlide, duration);
 
-        // Animiraj progress bar
+        // Pokrećemo animaciju širenja progress bara
+        // requestAnimationFrame osigurava da se promjena dogodi u sljedećem iscrtavanju ekrana (glađe)
         requestAnimationFrame(() => {
-          bar.style.transition = `width ${duration}ms linear`;
-          bar.style.width = "100%";
+          bar.style.transition = `width ${duration}ms linear`; // Animacija traje točno koliko i slajd
+          bar.style.width = "100%"; // Širi se do kraja
         });
       }
     }
 
-    // Sljedeći slajd
+    // Funkcija za prelazak na idući slajd
     function nextSlide() {
       loadSlide(currentSlide + 1);
     }
 
-    // Prethodni slajd
+    // Funkcija za povratak na prethodni slajd
     function previousSlide() {
+      // Dodajemo slides.length prije oduzimanja kako ne bismo dobili negativan broj
+      // (kružna rotacija unazad)
       loadSlide(currentSlide - 1 + slides.length);
     }
 
-    // Pokreni rotaciju
+    /**
+     * Pokreće automatsku rotaciju slajdova.
+     */
     function startRotation() {
+      // Prvo očistimo stari timer ako postoji da ne bi imali dva timera istovremeno
       if (rotationInterval) clearInterval(rotationInterval);
 
       const slide = slides[currentSlide];
       const duration = (slide && slide.duration) || rotationTime;
 
+      // Postavi novi timer koji će zvati nextSlide svakih 'duration' milisekundi
       rotationInterval = setInterval(nextSlide, duration);
       isPaused = false;
 
+      // Ažuriraj ikonu na gumbu (prikaži pauzu jer sad vrtimo)
       toggleBtn.innerHTML = ICON_PAUSE;
       toggleBtn.setAttribute("aria-label", "Pauziraj rotaciju");
       toggleBtn.setAttribute("title", "Pauziraj");
 
-      // Restart progress bar
+      // Pokreni animaciju progress bara
       bar.style.transition = "none";
       bar.style.width = "0%";
       requestAnimationFrame(() => {
@@ -178,27 +214,31 @@
       });
     }
 
-    // Zaustavi rotaciju
+    /**
+     * Zaustavlja automatsku rotaciju.
+     */
     function stopRotation() {
       if (rotationInterval) {
-        clearInterval(rotationInterval);
+        clearInterval(rotationInterval); // Zaustavi timer
         rotationInterval = null;
       }
 
       isPaused = true;
 
+      // Ažuriraj ikonu na gumbu (prikaži play jer smo stali)
       toggleBtn.innerHTML = ICON_PLAY;
       toggleBtn.setAttribute("aria-label", "Pokreni rotaciju");
       toggleBtn.setAttribute("title", "Pokreni");
 
-      // Zamrzni progress bar na trenutnoj poziciji
+      // "Zamrzni" napredak progress bara na trenutnoj poziciji
+      // Ovo radimo tako da izračunamo trenutnu širinu i fiksiramo je
       const computedStyle = window.getComputedStyle(bar);
       const width = computedStyle.getPropertyValue('width');
-      bar.style.transition = "none";
-      bar.style.width = width;
+      bar.style.transition = "none"; // Ukloni animaciju
+      bar.style.width = width;       // Ostavi širinu kakva je
     }
 
-    // Toggle pauza/play
+    // Funkcija koja se poziva klikom na gumb za pauzu/start
     function toggleRotation() {
       if (isPaused) {
         startRotation();
@@ -207,7 +247,10 @@
       }
     }
 
-    // Event listeneri
+    /* --------------------------------------------------------------------------
+       4. POSTAVLJANJE OSLUŠKIVAČA DOGAĐAJA (Event Listeners)
+       Povezujemo klikove i tipke s funkcijama.
+    -------------------------------------------------------------------------- */
     toggleBtn.addEventListener("click", toggleRotation);
 
     document.getElementById("prevSlide").addEventListener("click", () => {
@@ -218,60 +261,64 @@
       nextSlide();
     });
 
-    // Keyboard shortcuts
+    // Podrška za tipkovnicu (strelice i razmaknica)
     document.addEventListener("keydown", (e) => {
       if (e.key === "ArrowLeft") {
         previousSlide();
       } else if (e.key === "ArrowRight") {
         nextSlide();
       } else if (e.key === " " || e.key === "Spacebar") {
-        e.preventDefault();
+        e.preventDefault(); // Spriječi skrolanje stranice kad se stisne Space
         toggleRotation();
       }
     });
 
-    // Inicijalizacija
+    /* --------------------------------------------------------------------------
+       5. INICIJALIZACIJA (Start aplikacije)
+       Učitavamo postavke iz JSON datoteke i pokrećemo rotaciju.
+    -------------------------------------------------------------------------- */
     async function init() {
       try {
+        // Fetch API dohvaća podatke s mreže (ili lokalnog diska)
+        // Dodajemo '?t=' + Date.now() kako bismo spriječili "keširanje" 
+        // (da preglednik ne pamti staru verziju datoteke)
         const response = await fetch('config.json?t=' + Date.now());
+
+        // Pretvaramo odgovor u JSON objekt
         const config = await response.json();
 
+        // Spremamo podatke iz configa u naše varijable
         slides = config.rotation.slides;
         rotationTime = config.rotation.defaultDuration || 12000;
 
-        // Update title if present
+        // Ako u configu postoje naslovi aplikacije, primijeni ih
         if (config.app) {
           if (config.app.title) document.querySelector('.header__title').textContent = config.app.title;
           if (config.app.subtitle) document.querySelector('.header__subtitle').textContent = config.app.subtitle;
         }
 
-        console.log(`Loaded ${slides.length} slides from config.`);
+        console.log(`Učitano ${slides.length} slajdova iz konfiguracije.`);
 
+        // Prikaži prvi slajd
         loadSlide(0);
-        // Start automatically
-        // startRotation is called inside loadSlide logic mostly, but we trigger the first interval:
-        // Actually loadSlide handles bar animation, but we need to ensure interval calls nextSlide.
-        // Let's explicitly start it.
-        // Note: loadSlide doesn't start interval if isPaused is true.
-        // Intially isPaused is false.
-
-        // However, loadSlide logic above has: 
-        // if (!isPaused) { clearInterval; setInterval; }
-        // So calling loadSlide(0) will start the rotation if isPaused is false.
+        // loadSlide će pokrenuti rotaciju ako isPaused nije true (a nije na početku)
 
       } catch (error) {
-        console.error("Failed to load config.json", error);
-        // Show global error
+        // Ako se dogodi greška (npr. ne nađe config.json), ispiši grešku korisniku
+        console.error("Greška pri učitavanju config.json:", error);
+
+        // Prikaži globalni overlay s porukom o grešci
         document.getElementById('globalError').style.display = 'block';
         document.getElementById('globalErrorMsg').textContent = "Nije moguće učitati konfiguraciju (config.json).";
         label.textContent = "GREŠKA";
       }
     }
 
+    // Pokreni inicijalizaciju
     init();
 
-    // Debugging info (može se ukloniti u produkciji)
-    console.log(`Rotacija pokrenuta: ${slides.length} slajdova × ${rotationTime / 1000}s = ${(slides.length * rotationTime) / 60000} min`);
+    // Ispis u konzolu za developera
+    console.log(`Aplikacija pokrenuta.`);
   </script>
 
 </body>

@@ -1,11 +1,19 @@
-/* ================================
-   GLOBAL RESET & BASE
-================================ */
+/* ==========================================================================
+   GLAVNA STILSKA DATOTEKA (CSS)
+   
+   Ovdje definiramo izgled aplikacije. Koristimo CSS varijable (Custom Properties)
+   za boje i dimenzije kako bismo ih lako mijenjali na jednom mjestu.
+========================================================================== */
 
+/* --------------------------------------------------------------------------
+   RESETIRANJE I BAZNE POSTAVKE
+   Uklanjamo zadane margine preglednika i postavljamo osnovni font.
+-------------------------------------------------------------------------- */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+  /* Dimenzije elementa uključuju padding i border */
 }
 
 html,
@@ -15,46 +23,73 @@ body {
   width: 100%;
   height: 100%;
   background: var(--bg-main);
+  /* Koristimo varijablu definiranu u :root */
   color: var(--text-main);
   font-family: "Inter", "Roboto", system-ui, sans-serif;
+  /* Prioritet fontova */
 }
 
+/* --------------------------------------------------------------------------
+   DEFINICIJA VARIJABLI (PALETA BOJA)
+   :root je pseudo-klasa koja označava najviši element (html).
+   Varijable počinju s dvostrukom crticom (--).
+-------------------------------------------------------------------------- */
 :root {
   /* Pozadine */
   --bg-main: #0b1118;
+  /* Glavna tamna pozadina */
   --bg-surface: #162433;
+  /* Svjetlija površina za tablice */
   --bg-surface-alt: #1d3145;
+  /* Zaglavlja tablice */
 
   /* Tekst */
   --text-main: #eaeef2;
+  /* Glavna bijela boja teksta */
   --text-muted: #90adcb;
+  /* Prigušena plavkasto-siva za manje važne tekstove */
 
-  /* Status boje */
+  /* Status boje (indiktatori stanja) */
   --status-normal: #2f80ed;
+  /* Plava */
   --status-pripremno: #f2c94c;
+  /* Žuta */
   --status-redovna: #eb5757;
+  /* Crvena */
   --status-izvanredna: #9b1c1c;
+  /* Tamno crvena */
   --status-izvanredno: #5a0f0f;
+  /* Ekstremno crvena (skoro crna) */
 
-  /* Trend boje */
+  /* Trend boje (raste/pada) */
   --trend-up: #f2994a;
+  /* Narančasta za rast */
   --trend-down: #27ae60;
+  /* Zelena za pad */
   --trend-stable: #90adcb;
+  /* Siva za stabilno */
 }
 
-/* ================================
-   LAYOUT
-================================ */
+/* --------------------------------------------------------------------------
+   LAYOUT (RASPORED)
+   Koristimo Flexbox za slaganje elemenata (Header - Main - Footer).
+-------------------------------------------------------------------------- */
 
 .app {
   display: flex;
+  /* Uključi Flexbox */
   flex-direction: column;
+  /* Slaži elemente vertikalno (jedan ispod drugog) */
   height: 100%;
+  /* Zauzmi punu visinu ekrana */
 }
 
+/* Stilovi zajednički za zaglavlje i podnožje */
 .header,
 .footer {
   padding: 1.4rem 2.2rem;
+  /* Unutarnji razmak */
+  /* Poluprozirna pozadina s gradijentom za moderan izgled */
   background: linear-gradient(180deg,
       rgba(22, 36, 51, 0.9),
       rgba(11, 17, 24, 0.9));
@@ -63,17 +98,21 @@ body {
 .header {
   display: flex;
   justify-content: space-between;
+  /* Razmakni lijevi i desni sadržaj do rubova */
   align-items: center;
+  /* Centriraj vertikalno */
 }
 
 .header__title {
   font-size: 1.4rem;
   font-weight: 700;
+  /* Bold */
 }
 
 .header__subtitle {
   font-size: 0.9rem;
   color: var(--text-muted);
+  /* Koristi prigušenu boju */
 }
 
 .clock {
@@ -83,20 +122,25 @@ body {
 
 .content {
   flex: 1;
+  /* Zauzmi sav preostali slobodan prostor između headera i footera */
   padding: 2rem;
 }
 
 /* ================================
-   TABLE
+   TABLICE
 ================================ */
 
 .table {
   width: 100%;
   border-collapse: collapse;
+  /* Spoji rubove ćelija */
   table-layout: fixed;
+  /* Fiksna širina stupaca (brže iscrtavanje) */
   background: var(--bg-surface);
   border-radius: 1rem;
+  /* Zaobljeni rubovi tablice */
   overflow: hidden;
+  /* Sakrij sadržaj koji viri izvan zaobljenih rubova */
 }
 
 .table thead {
@@ -108,18 +152,22 @@ body {
   padding: 1.2rem;
   font-size: 0.8rem;
   letter-spacing: 0.08em;
+  /* Malo razmaknuta slova */
   color: var(--text-muted);
   text-transform: uppercase;
+  /* Sva slova velika */
 }
 
 .table td {
   padding: 1.4rem 1.2rem;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
+  /* Tanka linija razdvajanja */
   vertical-align: middle;
+  /* Sadržaj u sredini ćelije */
 }
 
 /* ================================
-   STATION INFO
+   PODACI O POSTAJAMA
 ================================ */
 
 .station {
@@ -522,7 +570,9 @@ body {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .error-icon {

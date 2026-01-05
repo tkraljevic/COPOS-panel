@@ -62,12 +62,19 @@
 
     </div>
 
+    <!-- Uključujemo naš parser za CSV -->
     <script src="js/csv-parser.js"></script>
     <script>
-        // Helper to map status text to CSS classes
+        /**
+         * Pomoćna funkcija: Određuje boju statusa
+         * @param {string} statusText - Tekst iz CSV-a (npr. "Redovna obrana")
+         * @returns {string} Ime CSS klase koja definira boju
+         */
         function getStatusClass(statusText) {
             if (!statusText) return "";
-            const lower = statusText.toLowerCase();
+            const lower = statusText.toLowerCase(); // Pretvaramo u mala slova za lakšu usporedbu
+
+            // Provjeravamo sadrži li tekst ključne riječi
             if (lower.includes("pripremno")) return "status--pripremno";
             if (lower.includes("redovna")) return "status--redovna";
             if (lower.includes("izvanredna")) return "status--izvanredna";
@@ -76,100 +83,109 @@
             return "status--nema-podataka";
         }
 
-        // Helper to format trend
+        /**
+         * Pomoćna funkcija: Formatira prikaz trenda (raste/pada)
+         * Dodaje strelice i boje ovisno o vrijednosti.
+         */
         function formatTrend(trendVal) {
             if (!trendVal) return `<span class="trend trend--stable">—</span>`;
 
-            // Replace U+2212 (HTML entity &minus;) or other fancy minus signs with standard hyphen
-            // Also remove 'cm' or whitespace if present
+            // Čišćenje podataka: Zamijeni čudne minuse (-) standardnim i makni sve što nije broj
             let cleanVal = trendVal.toString().replace(/[\u2212\u2013\u2014]/g, "-").replace(/[^\d+-]/g, "");
-
-            const val = parseInt(cleanVal, 10);
+            const val = parseInt(cleanVal, 10); // Pretvori string u cijeli broj
 
             if (isNaN(val)) {
-                // If it's explicitly "0" but parseInt failed (unlikely) or just garbage
-                if (cleanVal.trim() === "0") return `<span class="trend trend--stable">— stabilno</span>`;
                 return `<span class="trend trend--stable">—</span>`;
             }
 
             if (val > 0) {
-                // Force plus sign for positive numbers
+                // Pozitivan trend (Raste)
                 return `<span class="trend trend--up">▲ raste +${val} cm</span>`;
             } else if (val < 0) {
-                // Keep the minus sign in the number for display (e.g. "opada -3 cm")
-                // consistent with previous design "opada −3 cm"
+                // Negativan trend (Opada)
                 return `<span class="trend trend--down">▼ opada ${val} cm</span>`;
             } else {
+                // Nula (Stabilno)
                 return `<span class="trend trend--stable">— stabilno</span>`;
             }
         }
 
+        /**
+         * GLAVNA FUNKCIJA ZA UČITAVANJE PODATAKA
+         * async/await se koristi za asinkrone operacije (čekanje na odgovor servera)
+         */
         async function loadData() {
+            // Dohvati HTML elemente za UI stanja
             const loading = document.getElementById('loadingState');
             const error = document.getElementById('errorState');
             const table = document.getElementById('dataTable');
 
             try {
-                // Show loading
+                // 1. Prikaži spinner, sakrij grešku i tablicu
                 loading.style.display = 'block';
                 error.style.display = 'none';
                 table.style.display = 'none';
 
-                // Fetch config first
+                // 2. Učitaj konfiguraciju da saznamo URL podataka
                 const configResponse = await fetch('config.json?t=' + Date.now());
                 if (!configResponse.ok) throw new Error("Ne mogu učitati konfiguraciju");
-                const config = await configResponse.json();
-                const csvUrl = config.dataSources.hidro;
 
-                // Fetch directly from Google Sheets
+                const config = await configResponse.json();
+                const csvUrl = config.dataSources.hidro; // URL za hidrologiju
+
+                // 3. Dohvati podatke s Google Sheets-a
                 const response = await fetch(csvUrl + '&t=' + Date.now());
                 if (!response.ok) throw new Error("Ne mogu dohvatiti podatke (Google Sheets)");
-                const text = await response.text();
-                const data = parseCSV(text);
 
-                // Get Slide ID from URL
+                const text = await response.text(); // Pretvori odgovor u tekst
+                const data = parseCSV(text);        // Parsiraj tekst u objekte
+
+                // 4. Saznaj koji slajd trebamo prikazati (iz URL-a, npr. ?id=1)
                 const urlParams = new URLSearchParams(window.location.search);
                 const slideId = urlParams.get('id'); // e.g. "1"
 
-                // Filter data
+                // 5. Filtriraj samo podatke za taj slajd
                 const filtered = data.filter(row => row.SLAJD === slideId);
 
+                // 6. Iscrtaj tablicu
                 renderTable(filtered);
 
-                // Update Title/Footer if possible. 
+                // Ažuriraj naslov ako imamo podataka
                 if (filtered.length > 0) {
                     const title = "HIDROLOŠKI PODACI";
                     document.getElementById('pageTitle').textContent = title;
                 }
 
-                // Show data
+                // 7. Prikaži tablicu
                 loading.style.display = 'none';
                 table.style.display = 'table';
 
             } catch (e) {
-                console.error("Error loading data:", e);
+                // Ako bilo što krene po zlu, prikaži grešku
+                console.error("Greška pri učitavanju:", e);
                 loading.style.display = 'none';
                 error.style.display = 'block';
                 document.getElementById('errorMsg').textContent = e.message || "Provjerite internetsku vezu.";
             }
         }
 
+        /**
+         * Iscrtava redove u HTML tablici na temelju podataka.
+         */
         function renderTable(rows) {
             const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = "";
+            tbody.innerHTML = ""; // Očisti stare redove
 
             rows.forEach(row => {
-                // CSV Cols: SLAJD,POSTAJA,DATUM,VRIJEME,VODOSTAJ,TREND,DIONICE,STATUS
-
+                // Za svaki red podataka kreiramo novi HTML <tr> element
                 const tr = document.createElement('tr');
-                // Logic for critical/alert rows could be added if CSV has that info.
-                // For now, simple render.
 
+                // Izračunaj klasu za boju na temelju statusa
                 const statusClass = getStatusClass(row.STATUS);
-
-                // Trend HTML
+                // Formatiraj trend
                 const trendHtml = formatTrend(row.TREND);
 
+                // Popuni HTML unutar reda koristeći Template Literals (``)
                 tr.innerHTML = `
         <td>
           <div class="station">${row.POSTAJA}</div>
@@ -188,32 +204,15 @@
           <span class="status ${statusClass}">${row.STATUS || "NEMA PODATAKA"}</span>
         </td>
       `;
+                // Dodaj red u tijelo tablice
                 tbody.appendChild(tr);
             });
         }
 
+        // Pokreni učitavanje pri startu
         loadData();
 
-        // Clock logic if needed, but inner pages usually don't have the clock, index.html does.
-        // Original vodotok-1.html had updateClock() script but NO clock element in header (it's in index.html).
-        // Wait, vodotok-1.html DOES have <script> updateClock... but check the HTML...
-        // vodotok-1.html: <div class="clock" id="clock"> is MISSING in header HTML in vodotok-1.html.
-        // The header in vodotok-1.html is:
-        /*
-        <header class="header">
-          <div>
-            <div class="header__title">VODOTOK 1</div>...
-          </div>
-        </header>
-        */
-        // So the clock script in vodotok-1.html was likely redundant or dead code effectively.
-        // I will skip the clock here.
-
-    </script>
-    <script>
-        // Auto refresh every 5 mins to fetch new CSV data without full page reload if desired, 
-        // but <meta http-equiv="refresh" content="3600" /> is already there (1 hour).
-        // Let's add a soft data reload every 60 seconds just in case.
+        // Osvježi podatke automatski svake minute (60000 ms)
         setInterval(loadData, 60000);
     </script>
 </body>
