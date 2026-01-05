@@ -125,7 +125,7 @@
                 const tr = document.createElement('tr');
 
                 tr.innerHTML = `
-        <td style="font-weight:600; font-size:1.1rem;">
+        <td style="font-weight:600; font-size:1.6rem;">
           ${lokacija}
         </td>
         <td class="text-center">
@@ -133,23 +133,23 @@
         </td>
         
         <!-- Temp -->
-        <td class="text-center" style="font-size:1.2rem; font-weight:bold;">${temp}</td>
-        <td class="text-center" style="color:#8ecae6;">${tempMin}</td>
-        <td class="text-center" style="color:#e9c46a;">${tempMax}</td>
+        <td class="text-center" style="font-size:1.7rem; font-weight:bold;">${temp}</td>
+        <td class="text-center" style="color:#8ecae6; font-size:1.2rem;">${tempMin}</td>
+        <td class="text-center" style="color:#e9c46a; font-size:1.2rem;">${tempMax}</td>
 
         <!-- Wind -->
-        <td class="text-center">${vjetarSmjer}</td>
-        <td class="text-center">${vjetarBrzina}</td>
-        <td class="text-center" style="color:#e76f51;">${vjetarUdari}</td>
+        <td class="text-center" style="font-size:1.1rem;">${vjetarSmjer}</td>
+        <td class="text-center" style="font-size:1.7rem; font-weight:bold;">${vjetarBrzina}</td>
+        <td class="text-center" style="color:#e76f51; font-size:1.2rem;">${vjetarUdari}</td>
 
         <!-- Pressure/Humidity -->
-        <td class="text-center">${tlak}</td>
-        <td class="text-center" style="font-weight:bold;">${vlaga}</td>
+        <td class="text-center" style="font-size:1.2rem;">${tlak}</td>
+        <td class="text-center" style="font-weight:bold; font-size:1.7rem;">${vlaga}</td>
 
         <!-- Rain -->
-        <td class="text-center">${oborinaSat}</td>
-        <td class="text-center">${oborinaDan}</td>
-        <td class="text-center">${oborinaMjesec}</td>
+        <td class="text-center" style="font-size:1.2rem;">${oborinaSat}</td>
+        <td class="text-center" style="font-size:1.7rem; font-weight:bold;">${oborinaDan}</td>
+        <td class="text-center" style="font-size:1.2rem;">${oborinaMjesec}</td>
       `;
                 tbody.appendChild(tr);
             });
