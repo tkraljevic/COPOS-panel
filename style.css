@@ -414,6 +414,8 @@ body {
 .table--compact td {
   padding: 0.4rem 1rem;
   /* Dodatno smanjeno s 0.8rem */
+  line-height: 1.25;
+  /* Zbijeniji prored */
 }
 
 /* Column Widths */
