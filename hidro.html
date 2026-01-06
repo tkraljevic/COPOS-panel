@@ -41,21 +41,23 @@
                 <button class="btn-retry" onclick="loadData()">Pokušaj ponovno</button>
             </div>
 
-            <table class="table" id="dataTable" style="display: none;">
-                <thead>
-                    <tr>
-                        <th>Postaja</th>
-                        <th class="text-right">Vodostaj</th>
-                        <th>Zadnje očitanje</th>
-                        <th>Trend</th>
-                        <th>Status obrane</th>
-                    </tr>
-                </thead>
+            <div class="table-responsive">
+                <table class="table" id="dataTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Postaja</th>
+                            <th class="text-right">Vodostaj</th>
+                            <th>Zadnje očitanje</th>
+                            <th>Trend</th>
+                            <th>Status obrane</th>
+                        </tr>
+                    </thead>
 
-                <tbody id="tableBody">
-                    <!-- Rows will be populated by JS -->
-                </tbody>
-            </table>
+                    <tbody id="tableBody">
+                        <!-- Rows will be populated by JS -->
+                    </tbody>
+                </table>
+            </div>
         </main>
 
 
@@ -201,20 +203,20 @@
 
                 // Popuni HTML unutar reda koristeći Template Literals (``)
                 tr.innerHTML = `
-        <td>
+        <td data-label="Postaja / Dionica">
           <div class="station">${row.POSTAJA}</div>
           <div class="station__dionica">${row.DIONICE}</div>
         </td>
-        <td class="text-right">
+        <td class="text-right" data-label="Vodostaj">
           <span class="value">${row.VODOSTAJ}</span><span class="unit">cm</span>
         </td>
-        <td class="time">
+        <td class="time" data-label="Zadnje očitanje">
           ${row.DATUM}<br>${row.VRIJEME}
         </td>
-        <td>
+        <td data-label="Trend">
           ${trendHtml}
         </td>
-        <td>
+        <td data-label="Status obrane">
           <span class="status ${statusClass}">${row.STATUS || "NEMA PODATAKA"}</span>
         </td>
       `;

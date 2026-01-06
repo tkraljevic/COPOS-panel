@@ -41,22 +41,24 @@
                 <button class="btn-retry" onclick="loadData()">Pokušaj ponovno</button>
             </div>
 
-            <table class="table table--compact" id="dataTable" style="display: none;">
-                <thead>
-                    <tr>
-                        <th class="th--w-25">Dionica / Vodotok</th>
-                        <th class="th--w-15">Status</th>
-                        <th class="th--w-15">Mjerodavna Postaja</th>
-                        <th class="th--w-15">Kriterij</th>
-                        <th class="th--w-20">Rukovoditelj / Zamjenik</th>
-                        <th class="th--w-10 text-left">Vodočuvari</th>
-                    </tr>
-                </thead>
+            <div class="table-responsive">
+                <table class="table table--compact" id="dataTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th class="th--w-25">Dionica / Vodotok</th>
+                            <th class="th--w-15">Status</th>
+                            <th class="th--w-15">Mjerodavna Postaja</th>
+                            <th class="th--w-15">Kriterij</th>
+                            <th class="th--w-20">Rukovoditelj / Zamjenik</th>
+                            <th class="th--w-10 text-left">Vodočuvari</th>
+                        </tr>
+                    </thead>
 
-                <tbody id="tableBody">
-                    <!-- Rows will be populated by JS -->
-                </tbody>
-            </table>
+                    <tbody id="tableBody">
+                        <!-- Rows will be populated by JS -->
+                    </tbody>
+                </table>
+            </div>
         </main>
 
 
@@ -176,24 +178,24 @@
                 const tr = document.createElement('tr');
 
                 tr.innerHTML = `
-        <td>
+        <td data-label="Dionica / Vodotok">
           <div class="station dionica-code">${oznaka}</div>
           <div class="station__dionica vodotok-name">${vodotok}</div>
         </td>
-        <td class="text-left">
+        <td class="text-left" data-label="Status">
              ${statusText ? `<span class="status ${statusClass}">${statusText}</span>` : ''}
         </td>
-        <td>
+        <td data-label="Mjerodavna Postaja">
           <strong class="postaja-name">${postaja}</strong>
         </td>
-        <td>
+        <td data-label="Kriterij">
           <span class="kriterij-text">${kriterij}</span>
         </td>
-        <td>
+        <td data-label="Rukovodstvo">
           <div class="person-lead">${rukovoditelj}</div>
           ${zamjenik ? `<div class="person-sub" style="margin-top: 0.1rem; color: var(--text-muted);">${zamjenik}</div>` : ''}
         </td>
-        <td class="person-sub text-left">${vodocuvari}</td>
+        <td class="person-sub text-left" data-label="Vodočuvari">${vodocuvari}</td>
       `;
                 tbody.appendChild(tr);
             });
