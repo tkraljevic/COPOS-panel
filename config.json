@@ -9,11 +9,13 @@
         "slides": [
             {
                 "src": "hidro.html?id=1",
-                "label": "VODOSTAJI - 1"
+                "label": "VODOSTAJI - 1",
+                "duration": 20000
             },
             {
                 "src": "hidro.html?id=2",
-                "label": "VODOSTAJI - 2"
+                "label": "VODOSTAJI - 2",
+                "duration": 20000
             },
             {
                 "src": "meteo.html?id=1",
