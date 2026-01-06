@@ -2,7 +2,7 @@
     "app": {
         "title": "CENTAR OBRANE OD POPLAVA – OSIJEK",
         "subtitle": "INFO PANEL",
-        "refreshInterval": 600000
+        "refreshInterval": 36000000
     },
     "rotation": {
         "defaultDuration": 15000,
