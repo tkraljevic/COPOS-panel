@@ -41,37 +41,39 @@
                 <button class="btn-retry" onclick="loadData()">Pokušaj ponovno</button>
             </div>
 
-            <table class="table table--compact" id="dataTable" style="display: none;">
-                <thead>
-                    <tr>
-                        <th rowspan="2" class="meteo-col-location">Lokacija</th>
-                        <th rowspan="2" class="text-center meteo-col-datetime">Datum/Vrijeme</th>
-                        <th colspan="3" class="text-center">Temperatura (°C)</th>
-                        <th colspan="3" class="text-center">Vjetar (m/s)</th>
-                        <th rowspan="2" class="text-center meteo-col-narrow">Tlak (hPa)</th>
-                        <th rowspan="2" class="text-center meteo-col-narrow">Vlaga (%)</th>
-                        <th colspan="3" class="text-center">Oborina (mm)</th>
-                    </tr>
-                    <tr>
-                        <!-- Temp subheaders -->
-                        <th class="text-center meteo-col-narrow">Trenutna</th>
-                        <th class="text-center meteo-col-extra-narrow">Min</th>
-                        <th class="text-center meteo-col-extra-narrow">Max</th>
-                        <!-- Wind subheaders -->
-                        <th class="text-center meteo-col-extra-narrow">Smjer</th>
-                        <th class="text-center meteo-col-narrow">Brzina</th>
-                        <th class="text-center meteo-col-narrow">Udari</th>
-                        <!-- Rain subheaders -->
-                        <th class="text-center meteo-col-extra-narrow">Satna</th>
-                        <th class="text-center meteo-col-narrow">Dnevna</th>
-                        <th class="text-center meteo-col-extra-narrow">Mjes.</th>
-                    </tr>
-                </thead>
+            <div class="table-responsive">
+                <table class="table table--compact" id="dataTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="meteo-col-location">Lokacija</th>
+                            <th rowspan="2" class="text-center meteo-col-datetime">Datum/Vrijeme</th>
+                            <th colspan="3" class="text-center">Temperatura (°C)</th>
+                            <th colspan="3" class="text-center">Vjetar (m/s)</th>
+                            <th rowspan="2" class="text-center meteo-col-narrow">Tlak (hPa)</th>
+                            <th rowspan="2" class="text-center meteo-col-narrow">Vlaga (%)</th>
+                            <th colspan="3" class="text-center">Oborina (mm)</th>
+                        </tr>
+                        <tr>
+                            <!-- Temp subheaders -->
+                            <th class="text-center meteo-col-narrow">Trenutna</th>
+                            <th class="text-center meteo-col-extra-narrow">Min</th>
+                            <th class="text-center meteo-col-extra-narrow">Max</th>
+                            <!-- Wind subheaders -->
+                            <th class="text-center meteo-col-extra-narrow">Smjer</th>
+                            <th class="text-center meteo-col-narrow">Brzina</th>
+                            <th class="text-center meteo-col-narrow">Udari</th>
+                            <!-- Rain subheaders -->
+                            <th class="text-center meteo-col-extra-narrow">Satna</th>
+                            <th class="text-center meteo-col-narrow">Dnevna</th>
+                            <th class="text-center meteo-col-extra-narrow">Mjes.</th>
+                        </tr>
+                    </thead>
 
-                <tbody id="tableBody">
-                    <!-- Rows will be populated by JS -->
-                </tbody>
-            </table>
+                    <tbody id="tableBody">
+                        <!-- Rows will be populated by JS -->
+                    </tbody>
+                </table>
+            </div>
         </main>
 
 
@@ -161,31 +163,31 @@
                 const tr = document.createElement('tr');
 
                 tr.innerHTML = `
-        <td class="meteo-location">
+        <td class="meteo-location" data-label="Lokacija">
           ${lokacija}
         </td>
-        <td class="text-center">
+        <td class="text-center" data-label="Datum/Vrijeme">
           ${datum}<br>${vrijeme}
         </td>
         
         <!-- Temp -->
-        <td class="text-center meteo-temp-current">${temp}</td>
-        <td class="text-center meteo-temp-min">${tempMin}</td>
-        <td class="text-center meteo-temp-max">${tempMax}</td>
+        <td class="text-center meteo-temp-current" data-label="Temp (Trenutna)">${temp}</td>
+        <td class="text-center meteo-temp-min" data-label="Temp (Min)">${tempMin}</td>
+        <td class="text-center meteo-temp-max" data-label="Temp (Max)">${tempMax}</td>
 
         <!-- Wind -->
-        <td class="text-center meteo-wind-direction">${vjetarSmjer}</td>
-        <td class="text-center meteo-wind-speed">${vjetarBrzina}</td>
-        <td class="text-center meteo-wind-gust">${vjetarUdari}</td>
+        <td class="text-center meteo-wind-direction" data-label="Vjetar (Smjer)">${vjetarSmjer}</td>
+        <td class="text-center meteo-wind-speed" data-label="Vjetar (Brzina)">${vjetarBrzina}</td>
+        <td class="text-center meteo-wind-gust" data-label="Vjetar (Udari)">${vjetarUdari}</td>
 
         <!-- Pressure/Humidity -->
-        <td class="text-center meteo-pressure">${tlak}</td>
-        <td class="text-center meteo-humidity">${vlaga}</td>
+        <td class="text-center meteo-pressure" data-label="Tlak">${tlak}</td>
+        <td class="text-center meteo-humidity" data-label="Vlaga">${vlaga}</td>
 
         <!-- Rain -->
-        <td class="text-center meteo-rain">${oborinaSat}</td>
-        <td class="text-center meteo-rain-daily">${oborinaDan}</td>
-        <td class="text-center meteo-rain">${oborinaMjesec}</td>
+        <td class="text-center meteo-rain" data-label="Oborina (Satna)">${oborinaSat}</td>
+        <td class="text-center meteo-rain-daily" data-label="Oborina (Dnevna)">${oborinaDan}</td>
+        <td class="text-center meteo-rain" data-label="Oborina (Mjesečna)">${oborinaMjesec}</td>
       `;
                 tbody.appendChild(tr);
             });

@@ -651,3 +651,196 @@ body {
 .content.hidden {
   display: none;
 }
+
+/* ==========================================================================
+   RESPONSIVE DESIGN SYSTEM
+   Definicija prilagodbi za različite uređaje
+========================================================================== */
+
+/* 1. SCALING FOR MEGA SCREENS / VIDEO WALLS (4K+) */
+@media (min-width: 2560px) {
+  html {
+    font-size: 24px;
+    /* Značajno povećanje baznog fonta */
+  }
+
+  .app {
+    max-width: 100%;
+  }
+
+  .value {
+    font-size: 3.5rem;
+  }
+}
+
+/* 2. LARGE MONITORS (FullHD - 2K) */
+@media (min-width: 1921px) and (max-width: 2559px) {
+  html {
+    font-size: 18px;
+    /* Blago povećanje */
+  }
+}
+
+/* 3. LAPTOPS & DESKTOPS (Standard) - Default styles apply */
+
+/* 4. TABLETS & SMALL LAPTOPS (Portrait or Small Screens) */
+@media (max-width: 1024px) {
+  html {
+    font-size: 14px;
+    /* Smanji bazni font da stane više sadržaja */
+  }
+
+  .header {
+    padding: 1rem 1.5rem;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+
+  .value {
+    font-size: 2.2rem;
+  }
+}
+
+/* 5. MOBILE DEVICES */
+@media (max-width: 767px) {
+  html {
+    font-size: 13px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.8rem 1rem;
+  }
+
+  .clock {
+    align-self: flex-end;
+    font-size: 1rem;
+    margin-top: -1.5rem;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .rotation {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .progress {
+    width: 80px;
+  }
+
+  /* --- CARD VIEW TRANSFORMATION --- */
+
+  /* Reset table display */
+  .table-responsive {
+    overflow: visible;
+    /* Disable scroll for card view */
+  }
+
+  .table,
+  .table thead,
+  .table tbody,
+  .table th,
+  .table td,
+  .table tr {
+    display: block;
+    width: 100%;
+  }
+
+  /* Hide headers */
+  .table thead {
+    display: none;
+    /* position: absolute; top: -9999px; left: -9999px; */
+  }
+
+  .table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* Card Style for Rows */
+  .table tr {
+    background: var(--bg-surface);
+    border-radius: 0.8rem;
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* Cell Style */
+  .table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* Center vertically */
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: right;
+    /* Content to the right */
+    min-height: 2.5rem;
+    /* Ensure clickability/visibility */
+  }
+
+  .table td:last-child {
+    border-bottom: none;
+  }
+
+  /* Label using data-label attribute */
+  .table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: left;
+    margin-right: 1rem;
+    flex: 0 0 40%;
+    /* Label takes 40% width */
+  }
+
+  /* Specific tweaks for content */
+  .dionica-code {
+    font-size: 1.2rem;
+  }
+
+  .station,
+  .vodotok-name {
+    text-align: right;
+  }
+
+  .text-right,
+  .text-center,
+  .text-left {
+    text-align: right !important;
+  }
+
+  /* Sakrij prazne ćelije ili labele ako nema sadržaja (opcionalno) */
+  .table td:empty {
+    display: none;
+  }
+}
+
+/* Utility for wrapping tables - Desktop fallback */
+@media (min-width: 768px) {
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 1rem;
+    background: var(--bg-surface);
+  }
+
+  .table-responsive .table {
+    min-width: 600px;
+    border-radius: 0;
+  }
+}

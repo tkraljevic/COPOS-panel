@@ -323,7 +323,13 @@
 
         // Prikaži prvi slajd
         loadSlide(0);
-        // loadSlide će pokrenuti rotaciju ako isPaused nije true (a nije na početku)
+
+        // PROVJERA ZA MOBITEL: Ako je ekran uži od 768px, automatski pauziraj
+        if (window.innerWidth < 768) {
+          stopRotation(); // Pauziraj odmah
+          console.log("Mobitel detektiran: Rotacija automatski pauzirana.");
+        }
+        // Inače, loadSlide će pokrenuti rotaciju ako isPaused nije true (a nije na početku)
 
       } catch (error) {
         // Ako se dogodi greška (npr. ne nađe config.json), ispiši grešku korisniku
