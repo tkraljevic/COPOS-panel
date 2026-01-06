@@ -113,6 +113,19 @@ Aplikacija očekuje specifične stupce u tablicama. Najvažniji stupac je `SLAJD
 
 ---
 
+## Responzivni Dizajn (Web & Mobile)
+
+Aplikacija se automatski prilagođava veličini ekrana na kojem se prikazuje.
+
+### 1. Mobiteli (< 768px)
+*   **Card View**: Kako bi podaci bili čitljivi na malim ekranima, tablice se transformiraju u "kartice". Zaglavlja tablica se skrivaju, a svaki redak postaje zaseban blok s jasno označenim podacima.
+*   **Auto-Pause**: Na mobitelima se automatska rotacija slajdova **pauzira prema zadanim postavkama** kako bi korisnik mogao pregledavati podatke svojim tempom. Tipkom "Play" (trokutić) rotacija se može ponovno pokrenuti.
+
+### 2. Video Zidovi / Mega Ekrani (> 2560px)
+*   **Auto-Scaling**: Za ekrane vrlo visokih rezolucija (4K i veće), aplikacija automatski povećava veličinu fonta i sučelja kako bi podaci bili čitljivi s udaljenosti.
+
+---
+
 ## Rješavanje problema
 
 *   **Greška u inicijalizaciji / Nije moguće učitati konfiguraciju**
