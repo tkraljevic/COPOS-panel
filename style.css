@@ -768,66 +768,204 @@ body {
     gap: 1rem;
   }
 
-  /* Card Style for Rows */
+  /* Card Style for Rows - GRID LAYOUT */
   .table tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "station station"
+      "level level"
+      "time time"
+      "trend status";
+    gap: 0;
     background: var(--bg-surface);
-    border-radius: 0.8rem;
-    padding: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 1rem;
+    padding: 1.2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 1rem;
   }
 
-  /* Cell Style */
+  /* Reset Cell Styles */
   .table td {
-    display: flex;
+    display: block;
+    /* Vraća na block/flex unutar grida po potrebi */
+    border: none;
+    padding: 0;
+    text-align: left;
+    min-height: auto;
+  }
+
+  .table td::before {
+    display: none;
+    /* Hide old data-labels */
+  }
+
+  /* --- 1. STATION AREA --- */
+  .cell-station {
+    grid-area: station;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1rem !important;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .cell-station::before {
+    content: "POSTAJA / DIONICA";
+    display: block;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  /* Override station styles for this view */
+  .station {
+    font-size: 1.4rem;
+    /* Veći font */
+    line-height: 1.2;
+    margin-bottom: 0.2rem;
+  }
+
+  .station__dionica {
+    font-size: 0.9rem;
+    opacity: 0.7;
+  }
+
+  /* --- 2. LEVEL AREA --- */
+  .cell-level {
+    grid-area: level;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+
+  .cell-level::before {
+    content: "VODOSTAJ";
+    display: block;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .cell-level .value {
+    font-size: 5rem;
+    /* Huge font */
+    line-height: 1;
+    font-weight: 700;
+  }
+
+  .cell-level .unit {
+    font-size: 1.5rem;
+    font-weight: 600;
+    transform: translateY(-0.5rem);
+    opacity: 0.6;
+  }
+
+  /* --- 3. TIME AREA --- */
+  .cell-time {
+    grid-area: time;
+    display: flex !important;
     justify-content: space-between;
     align-items: center;
-    /* Center vertically */
-    padding: 0.6rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    text-align: right;
-    /* Content to the right */
-    min-height: 2.5rem;
-    /* Ensure clickability/visibility */
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
   }
 
-  .table td:last-child {
-    border-bottom: none;
-  }
-
-  /* Label using data-label attribute */
-  .table td::before {
-    content: attr(data-label);
-    font-weight: 600;
-    text-transform: uppercase;
+  .cell-time::after {
+    /* Labela 'ZADNJE OČITANJE' na lijevoj strani */
+    content: "ZADNJE OČITANJE";
+    order: -1;
+    /* Stavi na početak */
     font-size: 0.75rem;
+    letter-spacing: 0.08em;
     color: var(--text-muted);
-    text-align: left;
-    margin-right: 1rem;
-    flex: 0 0 40%;
-    /* Label takes 40% width */
+    text-transform: uppercase;
   }
 
-  /* Specific tweaks for content */
-  .dionica-code {
-    font-size: 1.2rem;
-  }
-
-  .station,
-  .vodotok-name {
-    text-align: right;
-  }
-
-  .text-right,
-  .text-center,
-  .text-left {
-    text-align: right !important;
-  }
-
-  /* Sakrij prazne ćelije ili labele ako nema sadržaja (opcionalno) */
-  .table td:empty {
+  .cell-time br {
     display: none;
+    /* U jednom redu vrijeme i datum ako stane, ili nek se lomi prirodno */
   }
+
+  /* Desna strana (vrijednost vremena) */
+  .cell-time {
+    text-align: right;
+    font-family: monospace;
+    /* Za ljepši prikaz brojeva */
+    letter-spacing: -0.02em;
+    font-weight: 600;
+    color: var(--text-main);
+  }
+
+  /* --- 4. TREND & STATUS GRID --- */
+  /* Ove dvije ćelije će biti kao gumbi dolje */
+
+  .cell-trend {
+    grid-area: trend;
+    padding-right: 0.5rem !important;
+  }
+
+  .cell-status {
+    grid-area: status;
+    padding-left: 0.5rem !important;
+  }
+
+  /* Style inner content to look like cards */
+  .cell-trend .trend,
+  .cell-status .status {
+    width: 100%;
+    height: 3.5rem;
+    /* Fiksna visina za gumb */
+    border-radius: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .cell-trend .trend {
+    justify-content: center;
+    flex-direction: column;
+    line-height: 1.1;
+    font-size: 0.8rem;
+    background: rgba(255, 255, 255, 0.03);
+    /* Default background */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Bojanje trenda cijelim boxom */
+  .cell-trend:has(.trend--up) .trend {
+    background: rgba(230, 126, 34, 0.2);
+    border-color: rgba(230, 126, 34, 0.5);
+    color: #ffdcb8;
+  }
+
+  .cell-trend:has(.trend--down) .trend {
+    background: rgba(39, 174, 96, 0.2);
+    border-color: rgba(39, 174, 96, 0.5);
+    color: #98eac0;
+  }
+
+  .status {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    /* Border za status */
+  }
+
+
 }
 
 /* Utility for wrapping tables - Desktop fallback */
