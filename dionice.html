@@ -41,23 +41,19 @@
                 <button class="btn-retry" onclick="loadData()">Pokušaj ponovno</button>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table--compact" id="dataTable" style="display: none;">
-                    <thead>
-                        <tr>
-                            <th class="th--w-25">Dionica / Vodotok</th>
-                            <th class="th--w-15">Status</th>
-                            <th class="th--w-15">Mjerodavna Postaja</th>
-                            <th class="th--w-15">Kriterij</th>
-                            <th class="th--w-20">Rukovoditelj / Zamjenik</th>
-                            <th class="th--w-10 text-left">Vodočuvari</th>
-                        </tr>
-                    </thead>
+            <div class="grid-table dionice-grid" id="dataTable" style="display: none;">
+                <div class="grid-header">
+                    <div class="col-dionica">Dionica / Vodotok</div>
+                    <div class="col-status">Status</div>
+                    <div class="col-postaja">Mjerodavna Postaja</div>
+                    <div class="col-kriterij">Kriterij</div>
+                    <div class="col-rukovoditelj">Rukovoditelj / Zamjenik</div>
+                    <div class="col-vodocuvari text-left">Vodočuvari</div>
+                </div>
 
-                    <tbody id="tableBody">
-                        <!-- Rows will be populated by JS -->
-                    </tbody>
-                </table>
+                <div class="grid-body" id="tableBody">
+                    <!-- Rows will be populated by JS -->
+                </div>
             </div>
         </main>
 
@@ -137,7 +133,7 @@
 
                 // Show data
                 loading.style.display = 'none';
-                table.style.display = 'table';
+                table.style.display = 'grid';
 
             } catch (e) {
                 console.error("Error loading data:", e);
@@ -175,27 +171,28 @@
                 const statusText = row['STATUS'] || "";
                 const statusClass = getStatusClass(statusText);
 
-                const tr = document.createElement('tr');
+                const tr = document.createElement('div');
+                tr.className = 'grid-row';
 
                 tr.innerHTML = `
-        <td data-label="Dionica / Vodotok">
+        <div data-label="Dionica / Vodotok">
           <div class="station dionica-code">${oznaka}</div>
           <div class="station__dionica vodotok-name">${vodotok}</div>
-        </td>
-        <td class="text-left" data-label="Status">
+        </div>
+        <div class="text-left" data-label="Status">
              ${statusText ? `<span class="status ${statusClass}">${statusText}</span>` : ''}
-        </td>
-        <td data-label="Mjerodavna Postaja">
+        </div>
+        <div data-label="Mjerodavna Postaja">
           <strong class="postaja-name">${postaja}</strong>
-        </td>
-        <td data-label="Kriterij">
+        </div>
+        <div data-label="Kriterij">
           <span class="kriterij-text">${kriterij}</span>
-        </td>
-        <td data-label="Rukovodstvo">
+        </div>
+        <div data-label="Rukovodstvo">
           <div class="person-lead">${rukovoditelj}</div>
           ${zamjenik ? `<div class="person-sub" style="margin-top: 0.1rem; color: var(--text-muted);">${zamjenik}</div>` : ''}
-        </td>
-        <td class="person-sub text-left" data-label="Vodočuvari">${vodocuvari}</td>
+        </div>
+        <div class="person-sub text-left" data-label="Vodočuvari">${vodocuvari}</div>
       `;
                 tbody.appendChild(tr);
             });

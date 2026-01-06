@@ -160,11 +160,184 @@ body {
 
 .table td {
   padding: 1.4rem 1.2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
   /* Tanka linija razdvajanja */
   vertical-align: middle;
   /* Sadržaj u sredini ćelije */
 }
+
+/* ================================
+   GRID TABLE SYSTEM (REFACTOR)
+   Zmjena za table elemente
+================================ */
+
+.grid-table {
+  width: 100%;
+  background: var(--bg-surface);
+  border-radius: 1rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-header {
+  display: grid;
+  background: var(--bg-surface-alt);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  align-items: center;
+}
+
+.grid-header>div {
+  padding: 1.2rem;
+}
+
+.grid-row {
+  display: grid;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  align-items: center;
+  transition: background 0.2s;
+}
+
+.grid-row>div {
+  padding: 1.4rem 1.2rem;
+}
+
+.grid-row:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* COLUMN DEFINITIONS */
+/* Hidro: Station | Level | Time | Trend | Status */
+.hidro-grid .grid-header,
+.hidro-grid .grid-row {
+  grid-template-columns: 2fr 1.2fr 1.2fr 1.2fr 1.4fr;
+}
+
+
+/* Meteo: Loc | DT | T(3) | W(3) | P | H | R(3) */
+.meteo-grid .grid-header,
+.meteo-grid .grid-row {
+  /* 13 columns total */
+  grid-template-columns:
+    2.5fr 1.5fr
+    /* Loc, DT */
+    1fr 0.8fr 0.8fr
+    /* Temp */
+    0.8fr 1fr 1fr
+    /* Wind */
+    1fr 1fr
+    /* Pres, Hum */
+    0.8fr 0.8fr 0.8fr;
+  /* Rain */
+}
+
+/* Meteo Header Specifics */
+.meteo-header-group {
+  display: grid;
+  grid-template-columns: subgrid;
+  /* Using subgrid if available? No, simpler to just repeat cols or use main grid definition on header container */
+  /* Actually, grid-header matches the main grid columns because of the rule above. */
+  /* But we have 2 levels of headers. */
+}
+
+/* We need to override the specific items in the top header row to span */
+.cell-loc-head {
+  grid-column: 1 / 2;
+  grid-row: 1 / 3;
+  align-self: center;
+}
+
+.cell-time-head {
+  grid-column: 2 / 3;
+  grid-row: 1 / 3;
+  align-self: center;
+}
+
+.cell-temp-head {
+  grid-column: 3 / 6;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cell-wind-head {
+  grid-column: 6 / 9;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cell-pres-head {
+  grid-column: 9 / 10;
+  grid-row: 1 / 3;
+  align-self: center;
+  text-align: center;
+}
+
+.cell-hum-head {
+  grid-column: 10 / 11;
+  grid-row: 1 / 3;
+  align-self: center;
+  text-align: center;
+}
+
+.cell-rain-head {
+  grid-column: 11 / 14;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Subheader row needs to sit below? 
+   Actually, I used two div containers for headers in HTML. 
+   Option 1: Allow headers to be separate grids.
+   Option 2: Use one grid container for all header items?
+   
+   In HTML I used:
+   <div class="grid-header meteo-header-group">...</div>
+   <div class="grid-header meteo-subheader">...</div>
+   
+   This implies TWO rows of headers.
+   Row 1: Group headers. Use spans.
+   Row 2: Sub headers. Use 13 cols.
+   
+   This works without rowspan if "Rowspan" items are replicated or empty in Row 2, 
+   OR if we use simple 2-row layout.
+   
+   But visually "Location" should be centered vertically across 2 rows.
+   Simple CSS Grid can't do this easily across TWO containers.
+   
+   Better solution: Hide Row 2 items for "Rowspan" cols?
+   Or just accept they are split rows.
+   
+   Let's just style them to align.
+*/
+.meteo-header-group .header-cell {
+  padding: 0.8rem 0.4rem;
+}
+
+.meteo-subheader {
+  padding-top: 0 !important;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.meteo-subheader>div {
+  /* Subheader cells */
+  padding: 0.4rem;
+  text-align: center;
+}
+
+/* Small adj for mobile cards override */
+/* We already handled mobile separately via media query */
+
+
+/* Dionice: Dionica | Status | Postaja | Kriterij | Rukovodstvo | Vodocuvari */
+.dionice-grid .grid-header,
+.dionice-grid .grid-row {
+  grid-template-columns: 2.5fr 1.5fr 1.5fr 1.5fr 2fr 1fr;
+}
+
 
 /* ================================
    PODACI O POSTAJAMA
@@ -741,11 +914,13 @@ body {
   /* --- CARD VIEW TRANSFORMATION --- */
 
   /* Reset table display */
-  .table-responsive {
+  .table-responsive,
+  .grid-table {
     overflow: visible;
     /* Disable scroll for card view */
   }
 
+  /* Reset layout for Table elements */
   .table,
   .table thead,
   .table tbody,
@@ -757,19 +932,22 @@ body {
   }
 
   /* Hide headers */
-  .table thead {
+  .table thead,
+  .grid-header {
     display: none;
     /* position: absolute; top: -9999px; left: -9999px; */
   }
 
-  .table tbody {
+  .table tbody,
+  .grid-body {
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
 
   /* Card Style for Rows - GRID LAYOUT */
-  .table tr {
+  .table tr,
+  .grid-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto auto auto;
@@ -788,7 +966,8 @@ body {
   }
 
   /* Reset Cell Styles */
-  .table td {
+  .table td,
+  .grid-row>div {
     display: block;
     /* Vraća na block/flex unutar grida po potrebi */
     border: none;
@@ -798,187 +977,529 @@ body {
   }
 
   .table td::before {
-    display: none;
     /* Hide old data-labels */
+    /* } - Removed premature closing brace */
+
+    /* --- 1. STATION AREA --- */
+    .cell-station {
+      grid-area: station;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 1rem !important;
+      display: flex !important;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .cell-station::before {
+      content: "POSTAJA / DIONICA";
+      display: block;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    /* Override station styles for this view */
+    .station {
+      font-size: 1.4rem;
+      /* Veći font */
+      line-height: 1.2;
+      margin-bottom: 0.2rem;
+    }
+
+    .station__dionica {
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+
+    /* --- 2. LEVEL AREA --- */
+    .cell-level {
+      grid-area: level;
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .cell-level::before {
+      content: "VODOSTAJ";
+      display: block;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .cell-level .value {
+      font-size: 5rem;
+      /* Huge font */
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    .cell-level .unit {
+      font-size: 1.5rem;
+      font-weight: 600;
+      transform: translateY(-0.5rem);
+      opacity: 0.6;
+    }
+
+    /* --- 3. TIME AREA --- */
+    .cell-time {
+      grid-area: time;
+      display: flex !important;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 1rem !important;
+      padding-bottom: 1rem !important;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+    }
+
+    .cell-time::after {
+      /* Labela 'ZADNJE OČITANJE' na lijevoj strani */
+      content: "ZADNJE OČITANJE";
+      order: -1;
+      /* Stavi na početak */
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .cell-time br {
+      display: none;
+      /* U jednom redu vrijeme i datum ako stane, ili nek se lomi prirodno */
+    }
+
+    /* Desna strana (vrijednost vremena) */
+    .cell-time {
+      text-align: right;
+      font-family: monospace;
+      /* Za ljepši prikaz brojeva */
+      letter-spacing: -0.02em;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* --- 4. TREND & STATUS GRID --- */
+    /* Ove dvije ćelije će biti kao gumbi dolje */
+
+    .cell-trend {
+      grid-area: trend;
+      padding-right: 0.5rem !important;
+    }
+
+    .cell-status {
+      grid-area: status;
+      padding-left: 0.5rem !important;
+    }
+
+    /* Style inner content to look like cards */
+    .cell-trend .trend,
+    .cell-status .status {
+      width: 100%;
+      height: 3.5rem;
+      /* Fiksna visina za gumb */
+      border-radius: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      margin: 0;
+    }
+
+    .cell-trend .trend {
+      justify-content: center;
+      flex-direction: column;
+      line-height: 1.1;
+      font-size: 0.8rem;
+      background: rgba(255, 255, 255, 0.03);
+      /* Default background */
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Bojanje trenda cijelim boxom */
+    .cell-trend:has(.trend--up) .trend {
+      background: rgba(230, 126, 34, 0.2);
+      border-color: rgba(230, 126, 34, 0.5);
+      color: #ffdcb8;
+    }
+
+    .cell-trend:has(.trend--down) .trend {
+      background: rgba(39, 174, 96, 0.2);
+      border-color: rgba(39, 174, 96, 0.5);
+      color: #98eac0;
+    }
+
+    .status {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      /* Border za status */
+    }
+
+
   }
 
-  /* --- 1. STATION AREA --- */
-  .cell-station {
-    grid-area: station;
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 1rem !important;
+  /* Utility for wrapping tables - Desktop fallback */
+  @media (min-width: 768px) {
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: 1rem;
+      background: var(--bg-surface);
+    }
+
+    .table-responsive .table {
+      min-width: 600px;
+      border-radius: 0;
+    }
+
+  }
+
+  /* --- METEO CARD GRID (Mobile) --- */
+  /* @media (max-width: 767px) { */
+
+  /* Override for Meteo Rows */
+  .table tr:has(.cell-loc),
+  .grid-row:has(.cell-loc) {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: auto auto 120px 100px auto;
+    grid-template-areas:
+      "loc loc loc loc"
+      "time time time time"
+      "temp temp wind wind"
+      "pres pres hum hum"
+      "rain rain rain rain";
+    gap: 1.2rem;
+    padding: 1.4rem;
+  }
+
+  /* Helper to make a cell look like a card panel */
+  .cell-temp-curr,
+  .cell-temp-min,
+  .cell-temp-max,
+  .cell-wind-val,
+  .cell-wind-dir,
+  .cell-wind-gust,
+  .cell-pres,
+  .cell-hum,
+  .cell-rain-h,
+  .cell-rain-d,
+  .cell-rain-m {
+    background: var(--bg-surface-alt);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 0.8rem;
+    padding: 1.2rem 0.8rem;
     display: flex !important;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
   }
 
-  .cell-station::before {
-    content: "POSTAJA / DIONICA";
-    display: block;
+  /* --- 1. LOCATION (Header) --- */
+  .cell-loc {
+    grid-area: loc;
+    font-size: 1.3rem;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0px;
+  }
+
+  .cell-loc::before {
+    content: "LOKACIJA";
     font-size: 0.7rem;
-    letter-spacing: 0.08em;
     color: var(--text-muted);
-    text-transform: uppercase;
-    margin-bottom: 0.4rem;
-  }
-
-  /* Override station styles for this view */
-  .station {
-    font-size: 1.4rem;
-    /* Veći font */
-    line-height: 1.2;
+    display: block;
+    font-weight: 600;
     margin-bottom: 0.2rem;
   }
 
-  .station__dionica {
-    font-size: 0.9rem;
-    opacity: 0.7;
-  }
-
-  /* --- 2. LEVEL AREA --- */
-  .cell-level {
-    grid-area: level;
-    display: flex !important;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 2rem;
-  }
-
-  .cell-level::before {
-    content: "VODOSTAJ";
-    display: block;
-    font-size: 0.75rem;
-    letter-spacing: 0.15em;
+  /* --- 2. TIME --- */
+  .cell-time {
+    grid-area: time;
+    text-align: right;
+    font-family: monospace;
     color: var(--text-muted);
-    text-transform: uppercase;
+    font-size: 0.9rem;
     margin-bottom: 0.5rem;
+    border-bottom: none !important;
+    padding: 0 !important;
+    justify-content: flex-end !important;
   }
 
-  .cell-level .value {
-    font-size: 5rem;
-    /* Huge font */
-    line-height: 1;
+  /* --- 3. TEMP GROUP --- */
+  .cell-temp-curr {
+    grid-column: 1 / 3;
+    grid-row: 3;
+
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 2.2rem !important;
+    padding-bottom: 2rem !important;
+    /* Space for Min/Max */
+    position: relative;
+    z-index: 1;
+    font-size: 3rem;
     font-weight: 700;
   }
 
-  .cell-level .unit {
-    font-size: 1.5rem;
-    font-weight: 600;
-    transform: translateY(-0.5rem);
-    opacity: 0.6;
-  }
-
-  /* --- 3. TIME AREA --- */
-  .cell-time {
-    grid-area: time;
-    display: flex !important;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: 1rem !important;
-    padding-bottom: 1rem !important;
-    margin-bottom: 1rem;
-    font-size: 0.95rem;
-  }
-
-  .cell-time::after {
-    /* Labela 'ZADNJE OČITANJE' na lijevoj strani */
-    content: "ZADNJE OČITANJE";
-    order: -1;
-    /* Stavi na početak */
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
+  .cell-temp-curr::after {
+    content: "TEMPERATURA";
+    position: absolute;
+    top: 0.8rem;
+    left: 0.8rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
     color: var(--text-muted);
+    font-weight: 600;
     text-transform: uppercase;
   }
 
-  .cell-time br {
-    display: none;
-    /* U jednom redu vrijeme i datum ako stane, ili nek se lomi prirodno */
-  }
-
-  /* Desna strana (vrijednost vremena) */
-  .cell-time {
-    text-align: right;
-    font-family: monospace;
-    /* Za ljepši prikaz brojeva */
-    letter-spacing: -0.02em;
-    font-weight: 600;
-    color: var(--text-main);
-  }
-
-  /* --- 4. TREND & STATUS GRID --- */
-  /* Ove dvije ćelije će biti kao gumbi dolje */
-
-  .cell-trend {
-    grid-area: trend;
-    padding-right: 0.5rem !important;
-  }
-
-  .cell-status {
-    grid-area: status;
-    padding-left: 0.5rem !important;
-  }
-
-  /* Style inner content to look like cards */
-  .cell-trend .trend,
-  .cell-status .status {
-    width: 100%;
-    height: 3.5rem;
-    /* Fiksna visina za gumb */
-    border-radius: 0.8rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .cell-temp-min {
+    grid-column: 1;
+    grid-row: 3;
+    z-index: 2;
+    background: transparent;
+    border: none;
+    align-self: end;
+    /* Align to bottom */
+    justify-content: flex-start;
+    /* Align left */
+    padding-left: 1rem !important;
+    padding-bottom: 0.8rem !important;
     font-size: 0.9rem;
-    margin: 0;
+    color: #8ecae6;
+    pointer-events: none;
+    flex-direction: row !important;
+    gap: 0.3rem;
   }
 
-  .cell-trend .trend {
-    justify-content: center;
-    flex-direction: column;
-    line-height: 1.1;
+  .cell-temp-min::before {
+    content: "Min";
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    opacity: 0.8;
+  }
+
+  .cell-temp-max {
+    grid-column: 2;
+    grid-row: 3;
+    z-index: 2;
+    background: transparent;
+    border: none;
+    align-self: end;
+    justify-content: flex-end;
+    /* Align right */
+    padding-right: 1rem !important;
+    padding-bottom: 0.8rem !important;
+    font-size: 0.9rem;
+    color: #e9c46a;
+    flex-direction: row !important;
+    gap: 0.3rem;
+  }
+
+  .cell-temp-max::before {
+    content: "Max";
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    opacity: 0.8;
+  }
+
+
+  /* --- 4. WIND GROUP --- */
+  .cell-wind-val {
+    grid-column: 3 / 5;
+    grid-row: 3;
+
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 2.2rem !important;
+    padding-bottom: 2rem !important;
+    position: relative;
+    font-size: 3rem;
+    font-weight: 700;
+    z-index: 1;
+  }
+
+  /* Label */
+  .cell-wind-val::after {
+    content: "VJETAR";
+    position: absolute;
+    top: 0.8rem;
+    left: 0.8rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .cell-wind-dir {
+    grid-column: 4;
+    grid-row: 3;
+    z-index: 2;
+    background: transparent;
+    border: none;
+    align-self: start;
+    /* Align top right */
+    justify-self: end;
+    padding-right: 0.8rem !important;
+    padding-top: 1.2rem !important;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--text-muted);
+  }
+
+  .cell-wind-gust {
+    grid-column: 3 / 5;
+    grid-row: 3;
+    z-index: 2;
+    background: transparent;
+    border: none;
+    align-self: end;
+    justify-content: flex-end;
+    /* Align right */
+    padding-right: 1rem !important;
+    /* Match Max Padding */
+    padding-bottom: 0.8rem !important;
+    font-size: 0.9rem;
+    color: #e76f51;
+    flex-direction: row !important;
+    gap: 0.5rem;
+  }
+
+  .cell-wind-gust::before {
+    content: "Udari";
+    color: var(--text-muted);
     font-size: 0.8rem;
-    background: rgba(255, 255, 255, 0.03);
-    /* Default background */
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  /* Bojanje trenda cijelim boxom */
-  .cell-trend:has(.trend--up) .trend {
-    background: rgba(230, 126, 34, 0.2);
-    border-color: rgba(230, 126, 34, 0.5);
-    color: #ffdcb8;
-  }
-
-  .cell-trend:has(.trend--down) .trend {
-    background: rgba(39, 174, 96, 0.2);
-    border-color: rgba(39, 174, 96, 0.5);
-    color: #98eac0;
-  }
-
-  .status {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    /* Border za status */
+    opacity: 0.8;
   }
 
 
-}
-
-/* Utility for wrapping tables - Desktop fallback */
-@media (min-width: 768px) {
-  .table-responsive {
-    width: 100%;
-    overflow-x: auto;
-    border-radius: 1rem;
-    background: var(--bg-surface);
+  /* --- 5. PRESSURE & HUMIDITY --- */
+  .cell-pres {
+    grid-area: pres;
+    /* Columns 1-2, Row 4 */
+    grid-column: 1 / 3;
+    position: relative;
+    align-items: flex-start !important;
+    padding-left: 1.2rem !important;
+    padding-top: 2.5rem !important;
+    font-size: 2.2rem;
+    font-weight: bold;
   }
 
-  .table-responsive .table {
-    min-width: 600px;
+  .cell-pres::after {
+    content: "TLAK";
+    position: absolute;
+    top: 0.8rem;
+    left: 0.8rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .cell-hum {
+    grid-column: 3 / 5;
+    /* Columns 3-4, Row 4 */
+    position: relative;
+    align-items: flex-start !important;
+    padding-left: 1.2rem !important;
+    padding-top: 2.5rem !important;
+    font-size: 2.2rem;
+    font-weight: bold;
+  }
+
+  .cell-hum::after {
+    content: "VLAGA";
+    position: absolute;
+    top: 0.8rem;
+    left: 0.8rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  /* --- 6. RAIN GROUP (Bottom) --- */
+  .cell-rain-h {
+    grid-column: 1 / 2;
+    grid-row: 5;
+    border-right: none;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    position: relative;
+    padding-top: 2.5rem !important;
+  }
+
+  /* Main label for the whole group in first cell */
+  .cell-rain-h::after {
+    content: "OBORINA (mm)";
+    position: absolute;
+    top: 0.6rem;
+    left: 0.4rem;
+    right: -300%;
+    /* Hack to span label across */
+    text-align: left;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    pointer-events: none;
+  }
+
+  .cell-rain-d {
+    grid-column: 2 / 4;
+    /* Span 2 cols in middle */
+    grid-row: 5;
+    border-left: none;
+    border-right: none;
     border-radius: 0;
+    padding-top: 2.5rem !important;
+  }
+
+  .cell-rain-m {
+    grid-column: 4 / 5;
+    grid-row: 5;
+    border-left: none;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding-top: 2.5rem !important;
+  }
+
+  /* Sub labels */
+  .cell-rain-h::before {
+    content: "Satna";
+  }
+
+  .cell-rain-d::before {
+    content: "Dnevna";
+  }
+
+  .cell-rain-m::before {
+    content: "Mjesečna";
+  }
+
+  .cell-rain-h::before,
+  .cell-rain-d::before,
+  .cell-rain-m::before {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.2rem;
+  }
+
+  .cell-rain-h,
+  .cell-rain-d,
+  .cell-rain-m {
+    font-size: 1.3rem;
+    font-weight: bold;
   }
 }
