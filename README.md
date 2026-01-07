@@ -2,6 +2,20 @@
 
 Ovo je web aplikacija "Info Panel" za Centar obrane od poplava – Osijek. Dizajnirana je za prikaz na velikim ekranima (kiosk mode) i automatski rotira ključne informacije: vodostaje, meteorološke podatke i status branjenih dionica.
 
+## Verzija v0.1.4-alpha
+
+Ova verzija donosi značajne promjene u arhitekturi konfiguracije aplikacije.
+
+**Glavne promjene:**
+*   **Centralizirana Konfiguracija**: Sve postavke koje su ranije bile "hardkodirane" u HTML datotekama (`dionice.html`, `hidro.html`, `meteo.html`) sada se nalaze u `config.json`. To uključuje intervale osvježavanja, naslove stranica, boje tema i tekstove u podnožju.
+*   **Dinamički Init**: Implementiran je novi sustav inicijalizacije (`init()`) koji prvo učitava postavke, a zatim pokreće aplikaciju. Ovo osigurava da promjene u konfiguraciji ne zahtijevaju diranje u kodu.
+*   **Pametno Osvježavanje**: Interval osvježavanja podataka sada se može globalno kontrolirati kroz `config.json` (`dataSources.refreshIntervalMs`), umjesto da je fiksiran na 60 sekundi u svakoj datoteci.
+*   **Prošireni Config.json**:
+    *   Dodana sekcija `app` za globalne postavke (footer, theme color).
+    *   Dodana sekcija `pages` za specifične naslove pojedinih modula.
+
+---
+
 ## Kako koristiti
 
 Iako je ovo statička aplikacija, **potrebno ju je pokrenuti putem lokalnog web servera** jer moderni preglednici blokiraju učitavanje konfiguracijskih datoteka (`config.json`) direktno s diska (CORS politika).
@@ -42,24 +56,28 @@ Sve postavke aplikacije nalaze se u datoteci `config.json`. **Nije potrebno mije
 
 ### Struktura datoteke
 
-Datoteka se sastoji od tri glavna dijela:
+Datoteka se sastoji od četiri glavna dijela:
 
-1.  **`app`**: Opće postavke aplikacije.
-2.  **`rotation`**: Postavke rotacije slajdova.
-3.  **`dataSources`**: Linkovi na podatke (Google Sheets).
+1.  **`app`**: Opće postavke aplikacije (novo u v0.1.4).
+2.  **`pages`**: Postavke specifične za podstranice (novo u v0.1.4).
+3.  **`rotation`**: Postavke rotacije slajdova.
+4.  **`dataSources`**: Linkovi na podatke (Google Sheets).
 
 ### 1. Opće postavke (`app`)
 
-Ovdje definirati naslove i interval osvježavanja cijele aplikacije.
+Ovdje definirate globalne atribute aplikacije.
 
 ```json
 "app": {
     "title": "CENTAR OBRANE OD POPLAVA – OSIJEK",
     "subtitle": "INFO PANEL",
-    "refreshInterval": 36000000 
+    "footerText": "Izvor: Hrvatske vode / DHMZ / SHMU / OVF",
+    "themeColor": "#0b1118",
+    "metaRefreshSeconds": 3600
 }
 ```
-*   `refreshInterval`: Vrijeme u milisekundama nakon kojeg se cijela stranica osvježava (npr. `600000` = 10 minuta).
+*   `footerText`: Tekst koji se prikazuje u lijevom kutu podnožja.
+*   `metaRefreshSeconds`: Interval (u sekundama) potpunog ponovnog učitavanja stranice (za oslobađanje memorije).
 
 ### 2. Rotacija (`rotation`)
 
@@ -73,33 +91,28 @@ Ovdje definirate koji se slajdovi prikazuju i koliko dugo.
             "src": "hidro.html?id=1",
             "label": "VODOSTAJI - 1"
         },
-        {
-            "src": "meteo.html?id=1",
-            "label": "Meteo Podaci - 1",
-            "duration": 20000
-        }
+        // ...
     ]
 }
 ```
-*   `defaultDuration`: Zadano trajanje slajda u milisekundama (ako nije specificirano drugačije).
-*   `slides`: Lista slajdova.
-    *   `src`: Putanja do datoteke. **Važno:** `?id=1` određuje koji dio podataka se prikazuje (filtrira se prema stupcu SLAJD u CSV-u).
-    *   `label`: Tekst koji se ispisuje u podnožju ekrana.
-    *   `duration`: (Opcionalno) Trajanje specifičnog slajda ako želite da bude duže ili kraće od zadanog.
+*   `defaultDuration`: Zadano trajanje slajda u milisekundama.
+*   `slides`: Lista slajdova (`src`, `label`, opcionalno `duration`).
 
 ### 3. Izvori podataka (`dataSources`)
 
-Ovdje lijepite linkove na CSV export iz Google Sheets tablica.
+Linkovi na CSV export iz Google Sheets tablica i frekvencija osvježavanja.
 
 ```json
 "dataSources": {
     "hidro": "https://docs.google.com/spreadsheets/d/.../export?format=csv",
     "meteo": "https://docs.google.com/spreadsheets/d/.../export?format=csv",
-    "dionice": "https://docs.google.com/spreadsheets/d/.../export?format=csv"
+    "dionice": "https://docs.google.com/spreadsheets/d/.../export?format=csv",
+    "refreshIntervalMs": 60000
 }
 ```
+*   `refreshIntervalMs`: Koliko često (u ms) skripte provjeravaju Google Sheets za nove podatke (zadano 60000 = 1 min).
 
-**Napomena:** Link mora završavati s `export?format=csv` kako bi aplikacija mogla pročitati podatke.
+---
 
 ## Struktura Podataka (CSV / Google Sheets)
 

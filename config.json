@@ -121,7 +121,7 @@
         "hidro": "https://docs.google.com/spreadsheets/d/1LcHVJVuSduu9fOkGEIObntiJAKp9GJxHb64YLGca3eA/export?format=csv",
         "meteo": "https://docs.google.com/spreadsheets/d/1SMKafklxgTvlkGy6alb389yPcCw09wQ3oMtJqTRsWk4/export?format=csv",
         "dionice": "https://docs.google.com/spreadsheets/d/1dGOlyKtqBZ1wYYUTehxvPDwkNrTJ0V9KLSdRzyX0JYc/export?format=csv",
-        "refreshIntervalMs": 60000
+        "refreshIntervalMs": 18000000
     },
     "pages": {
         "hidro": {
