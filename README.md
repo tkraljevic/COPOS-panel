@@ -2,6 +2,17 @@
 
 Ovo je web aplikacija "Info Panel" za Centar obrane od poplava – Osijek. Dizajnirana je za prikaz na velikim ekranima (kiosk mode) i automatski rotira ključne informacije: vodostaje, meteorološke podatke i status branjenih dionica.
 
+## Verzija v0.1.5-alpha
+
+Ova verzija donosi značajna poboljšanja stabilnosti i robusnosti sustava za parsiranje podataka.
+
+**Glavne promjene:**
+*   **Robusni CSV Parser**:
+    *   **Duplicate Header Handling**: Parser sada automatski preimenuje duplicirane nazive stupaca (npr. `Vrijednost`, `Vrijednost_2`) umjesto da prebriše podatke. Ovo rješava problem kada vanjski izvori podataka imaju neispravna zaglavlja.
+    *   **Zaštita od Praznih Ulaza**: Dodana je provjera za prazne ili neispravne ulazne podatke koja sprječava "rušenje" aplikacije i ispisuje jasno upozorenje u konzolu.
+    *   **Detekcija Grešaka**: Implementirano je tiho logiranje (debug level) kada broj stupaca u redu ne odgovara zaglavlju, što olakšava dijagnostiku problema s podacima bez ometanja rada aplikacije.
+    *   **Bolje Upravljanje Novim Redovima**: Poboljšana logika za ignoriranje praznih linija na kraju datoteke.
+
 ## Verzija v0.1.4-alpha
 
 Ova verzija donosi značajne promjene u arhitekturi konfiguracije aplikacije.
