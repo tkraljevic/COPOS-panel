@@ -2,6 +2,18 @@
 
 Ovo je web aplikacija "Info Panel" za Centar obrane od poplava – Osijek. Dizajnirana je za prikaz na velikim ekranima (kiosk mode) i automatski rotira ključne informacije: vodostaje, meteorološke podatke i status branjenih dionica.
 
+## Verzija v0.1.7-alpha
+
+Ova verzija proširuje funkcionalnost "Status dionica" s dodatnim informacijama i poboljšanom prezentacijom.
+
+**Glavne promjene:**
+*   **Novi Stupac "NASIP"**: U tablicu "Status dionica" dodan je stupac "NASIP" koji prikazuje podatke iz istoimenog stupca u Google tablicama.
+*   **Formatiranje Teksta**: Omogućeno je prikazivanje višestrukih redova teksta (novi redovi iz CSV-a) unutar ćelija tablice, čime se poboljšava čitljivost dužih opisa.
+*   **Poboljšani Layout**:
+    *   **Desktop**: Reorganizirana je mreža (grid) tablice kako bi podržala 7 stupaca uz optimalnu iskoristivost prostora.
+    *   **Mobile**: Ažuriran je kartični prikaz na mobitelima kako bi se novi podatak ispravno prikazivao s odgovarajućom oznakom.
+*   **Offline Mode Podrška**: Sustav keširanja verificirano podržava i nove podatke, osiguravajući dostupnost informacija o nasipima i bez internetske veze.
+
 ## Verzija v0.1.6-alpha
 
 Ova verzija implementira **Offline Mode** funkcionalnost.

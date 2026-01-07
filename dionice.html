@@ -49,6 +49,7 @@
             <div class="grid-table dionice-grid" id="dataTable" style="display: none;">
                 <div class="grid-header">
                     <div class="col-dionica">Dionica / Vodotok</div>
+                    <div class="col-nasip">Nasip</div>
                     <div class="col-status">Status</div>
                     <div class="col-postaja">Mjerodavna Postaja</div>
                     <div class="col-kriterij">Kriterij</div>
@@ -250,6 +251,7 @@
 
                 const oznaka = row['OZNAKA PODRUČJA'] || row['OZNAKAE PODRUČJA'];
                 const vodotok = row['VODOTOK'];
+                const nasip = row['NASIP'] || "";
 
                 // Skip invalid rows
                 if (!oznaka && !vodotok) return;
@@ -273,6 +275,9 @@
         <div data-label="Dionica / Vodotok">
           <div class="station dionica-code">${oznaka}</div>
           <div class="station__dionica vodotok-name">${vodotok}</div>
+        </div>
+        <div data-label="Nasip">
+             <div class="nasip-text">${nasip}</div>
         </div>
         <div class="text-left" data-label="Status">
              ${statusText ? `<span class="status ${statusClass}">${statusText}</span>` : ''}

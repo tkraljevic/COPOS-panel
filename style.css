@@ -148,7 +148,7 @@ body {
 
 .dionice-grid .grid-header,
 .dionice-grid .grid-row {
-    grid-template-columns: 2.5fr 1.5fr 1.5fr 1.5fr 2fr 1fr;
+    grid-template-columns: 2.2fr 2.5fr 1.1fr 1.3fr 1.3fr 1.8fr 0.8fr;
 }
 
 /* METEO HEADER */
@@ -412,6 +412,11 @@ body {
 
 .person-sub {
     font-size: 0.9rem;
+    white-space: pre-wrap;
+}
+
+.nasip-text {
+    font-weight: 700;
     white-space: pre-wrap;
 }
 
@@ -1144,22 +1149,26 @@ body {
     }
 
     .dionice-grid .grid-row>div:nth-child(2)::before {
-        content: "STATUS";
+        content: "NASIP";
     }
 
     .dionice-grid .grid-row>div:nth-child(3)::before {
-        content: "MJERODAVNA POSTAJA";
+        content: "STATUS";
     }
 
     .dionice-grid .grid-row>div:nth-child(4)::before {
-        content: "KRITERIJ";
+        content: "MJERODAVNA POSTAJA";
     }
 
     .dionice-grid .grid-row>div:nth-child(5)::before {
-        content: "RUKOVODITELJ / ZAMJENIK";
+        content: "KRITERIJ";
     }
 
     .dionice-grid .grid-row>div:nth-child(6)::before {
+        content: "RUKOVODITELJ / ZAMJENIK";
+    }
+
+    .dionice-grid .grid-row>div:nth-child(7)::before {
         content: "VODOČUVARI";
     }
 
