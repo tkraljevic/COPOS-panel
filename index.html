@@ -317,6 +317,11 @@
         if (config.app) {
           if (config.app.title) document.querySelector('.header__title').textContent = config.app.title;
           if (config.app.subtitle) document.querySelector('.header__subtitle').textContent = config.app.subtitle;
+          if (config.app.footerText) document.querySelector('.footer > div:first-child').textContent = config.app.footerText;
+          if (config.app.themeColor) {
+            const metaTheme = document.querySelector('meta[name="theme-color"]');
+            if (metaTheme) metaTheme.setAttribute('content', config.app.themeColor);
+          }
         }
 
         console.log(`Učitano ${slides.length} slajdova iz konfiguracije.`);

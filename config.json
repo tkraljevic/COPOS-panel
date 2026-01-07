@@ -2,7 +2,9 @@
     "app": {
         "title": "CENTAR OBRANE OD POPLAVA – OSIJEK",
         "subtitle": "INFO PANEL",
-        "refreshInterval": 36000000
+        "footerText": "Izvor: Hrvatske vode / DHMZ / SHMU / OVF",
+        "themeColor": "#0b1118",
+        "metaRefreshSeconds": 3600
     },
     "rotation": {
         "defaultDuration": 15000,
@@ -97,19 +99,19 @@
                 "src": "dionice.html?id=17",
                 "label": "Status Dionica - 17"
             },
-                        {
+            {
                 "src": "dionice.html?id=18",
                 "label": "Status Dionica - 18"
             },
-                        {
+            {
                 "src": "dionice.html?id=19",
                 "label": "Status Dionica - 19"
             },
-                        {
+            {
                 "src": "dionice.html?id=20",
                 "label": "Status Dionica - 20"
             },
-                        {
+            {
                 "src": "dionice.html?id=21",
                 "label": "Status Dionica - 21"
             }
@@ -118,6 +120,24 @@
     "dataSources": {
         "hidro": "https://docs.google.com/spreadsheets/d/1LcHVJVuSduu9fOkGEIObntiJAKp9GJxHb64YLGca3eA/export?format=csv",
         "meteo": "https://docs.google.com/spreadsheets/d/1SMKafklxgTvlkGy6alb389yPcCw09wQ3oMtJqTRsWk4/export?format=csv",
-        "dionice": "https://docs.google.com/spreadsheets/d/1dGOlyKtqBZ1wYYUTehxvPDwkNrTJ0V9KLSdRzyX0JYc/export?format=csv"
+        "dionice": "https://docs.google.com/spreadsheets/d/1dGOlyKtqBZ1wYYUTehxvPDwkNrTJ0V9KLSdRzyX0JYc/export?format=csv",
+        "refreshIntervalMs": 60000
+    },
+    "pages": {
+        "hidro": {
+            "browserTitle": "COPOS – Hidro Podaci",
+            "pageTitle": "VODOTOK",
+            "pageSubtitle": "Trenutni vodostaji – mjerodavne postaje"
+        },
+        "meteo": {
+            "browserTitle": "COPOS – Meteo Podaci",
+            "pageTitle": "METEOROLOŠKI PODACI",
+            "pageSubtitle": "Trenutno stanje na postajama"
+        },
+        "dionice": {
+            "browserTitle": "COPOS – Status Dionica",
+            "pageTitle": "STATUS DIONICA",
+            "pageSubtitle": "Pregled branjenih dionica i odgovornih osoba"
+        }
     }
 }

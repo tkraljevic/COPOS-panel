@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="refresh" content="3600" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>COPOS – Hidro Podaci</title>
@@ -126,54 +126,83 @@
          * GLAVNA FUNKCIJA ZA UČITAVANJE PODATAKA
          * async/await se koristi za asinkrone operacije (čekanje na odgovor servera)
          */
-        async function loadData() {
-            // Dohvati HTML elemente za UI stanja
+        async function init() {
+            try {
+                const response = await fetch('config.json?t=' + Date.now());
+                const config = await response.json();
+
+                // 1. App Settings
+                if (config.app) {
+                    if (config.app.themeColor) {
+                        let meta = document.querySelector('meta[name="theme-color"]');
+                        if (!meta) {
+                            meta = document.createElement('meta');
+                            meta.name = "theme-color";
+                            document.head.appendChild(meta);
+                        }
+                        meta.setAttribute('content', config.app.themeColor);
+                    }
+                    if (config.app.metaRefreshSeconds) {
+                        setTimeout(() => location.reload(), config.app.metaRefreshSeconds * 1000);
+                    }
+                }
+
+                // 2. Page Settings
+                if (config.pages && config.pages.hidro) {
+                    const p = config.pages.hidro;
+                    if (p.browserTitle) document.title = p.browserTitle;
+                    if (p.pageTitle) {
+                        const titleEl = document.getElementById('pageTitle') || document.querySelector('.header__title');
+                        if (titleEl) titleEl.textContent = p.pageTitle;
+                    }
+                    if (p.pageSubtitle) document.querySelector('.header__subtitle').textContent = p.pageSubtitle;
+                }
+
+                // 3. Start
+                loadData(config);
+                const interval = (config.dataSources && config.dataSources.refreshIntervalMs) || 60000;
+                setInterval(() => loadData(), interval);
+
+            } catch (e) {
+                console.error("Init Error:", e);
+            }
+        }
+
+        async function loadData(preloadedConfig = null) {
             const loading = document.getElementById('loadingState');
             const error = document.getElementById('errorState');
             const table = document.getElementById('dataTable');
 
             try {
-                // 1. Prikaži spinner, sakrij grešku i tablicu
-                loading.style.display = 'block';
+                if (table.style.display === 'none') {
+                    loading.style.display = 'block';
+                }
                 error.style.display = 'none';
-                table.style.display = 'none';
 
-                // 2. Učitaj konfiguraciju da saznamo URL podataka
-                const configResponse = await fetch('config.json?t=' + Date.now());
-                if (!configResponse.ok) throw new Error("Ne mogu učitati konfiguraciju");
-
-                const config = await configResponse.json();
-                const csvUrl = config.dataSources.hidro; // URL za hidrologiju
-
-                // 3. Dohvati podatke s Google Sheets-a
-                const response = await fetch(csvUrl + '&t=' + Date.now());
-                if (!response.ok) throw new Error("Ne mogu dohvatiti podatke (Google Sheets)");
-
-                const text = await response.text(); // Pretvori odgovor u tekst
-                const data = parseCSV(text);        // Parsiraj tekst u objekte
-
-                // 4. Saznaj koji slajd trebamo prikazati (iz URL-a, npr. ?id=1)
-                const urlParams = new URLSearchParams(window.location.search);
-                const slideId = urlParams.get('id'); // e.g. "1"
-
-                // 5. Filtriraj samo podatke za taj slajd
-                const filtered = data.filter(row => row.SLAJD === slideId);
-
-                // 6. Iscrtaj tablicu
-                renderTable(filtered);
-
-                // Ažuriraj naslov ako imamo podataka
-                if (filtered.length > 0) {
-                    const title = "HIDROLOŠKI PODACI";
-                    document.getElementById('pageTitle').textContent = title;
+                let config = preloadedConfig;
+                if (!config) {
+                    const r = await fetch('config.json?t=' + Date.now());
+                    if (!r.ok) throw new Error("Ne mogu učitati konfiguraciju");
+                    config = await r.json();
                 }
 
-                // 7. Prikaži tablicu
+                const csvUrl = config.dataSources.hidro;
+                const response = await fetch(csvUrl + '&t=' + Date.now());
+                if (!response.ok) throw new Error("Ne mogu dohvatiti podatke (Google Sheets)");
+                const text = await response.text();
+                const data = parseCSV(text);
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const slideId = urlParams.get('id');
+                let filtered = data;
+                if (slideId) filtered = data.filter(row => row.SLAJD === slideId);
+
+                renderTable(filtered);
+
                 loading.style.display = 'none';
-                table.style.display = 'grid'; // Grid display
+                table.style.display = 'grid';
 
             } catch (e) {
-                // Ako bilo što krene po zlu, prikaži grešku
                 console.error("Greška pri učitavanju:", e);
                 loading.style.display = 'none';
                 error.style.display = 'block';
@@ -181,24 +210,16 @@
             }
         }
 
-        /**
-         * Iscrtava redove u HTML tablici na temelju podataka.
-         */
         function renderTable(rows) {
             const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = ""; // Očisti stare redove
+            tbody.innerHTML = "";
 
             rows.forEach(row => {
-                // Za svaki red podataka kreiramo novi HTML div element (grid-row)
                 const tr = document.createElement('div');
                 tr.className = 'grid-row';
-
-                // Izračunaj klasu za boju na temelju statusa
                 const statusClass = getStatusClass(row.STATUS);
-                // Formatiraj trend
                 const trendHtml = formatTrend(row.TREND);
 
-                // Popuni HTML unutar reda koristeći Template Literals (``)
                 tr.innerHTML = `
         <div class="cell-station" data-label="Postaja / Dionica">
           <div class="station">${row.POSTAJA}</div>
@@ -217,16 +238,11 @@
           <span class="status ${statusClass}">${row.STATUS || "NEMA PODATAKA"}</span>
         </div>
       `;
-                // Dodaj red u tijelo tablice
                 tbody.appendChild(tr);
             });
         }
 
-        // Pokreni učitavanje pri startu
-        loadData();
-
-        // Osvježi podatke automatski svake minute (60000 ms)
-        setInterval(loadData, 60000);
+        init();
     </script>
 </body>
 

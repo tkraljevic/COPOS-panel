@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="refresh" content="3600" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>COPOS – Status Dionica</title>
@@ -96,21 +96,73 @@
             return "status--nema-podataka";
         }
 
-        async function loadData() {
+        async function init() {
+            try {
+                const response = await fetch('config.json?t=' + Date.now());
+                const config = await response.json();
+
+                // 1. App Settings (Theme, Refresh)
+                if (config.app) {
+                    if (config.app.themeColor) {
+                        let meta = document.querySelector('meta[name="theme-color"]');
+                        if (!meta) {
+                            meta = document.createElement('meta');
+                            meta.name = "theme-color";
+                            document.head.appendChild(meta);
+                        }
+                        meta.setAttribute('content', config.app.themeColor);
+                    }
+                    // Page Reload (Meta Refresh replacement)
+                    if (config.app.metaRefreshSeconds) {
+                        console.log(`Setting page reload in ${config.app.metaRefreshSeconds}s`);
+                        setTimeout(() => location.reload(), config.app.metaRefreshSeconds * 1000);
+                    }
+                }
+
+                // 2. Page Settings (Titles)
+                if (config.pages && config.pages.dionice) {
+                    const p = config.pages.dionice;
+                    if (p.browserTitle) document.title = p.browserTitle;
+                    if (p.pageTitle) document.querySelector('.header__title').textContent = p.pageTitle;
+                    if (p.pageSubtitle) document.querySelector('.header__subtitle').textContent = p.pageSubtitle;
+                }
+
+                // 3. Start Data Loop
+                // Pass config to loadData to avoid re-fetching immediately
+                loadData(config);
+
+                const interval = (config.dataSources && config.dataSources.refreshIntervalMs) || 60000;
+                setInterval(() => loadData(), interval);
+
+            } catch (e) {
+                console.error("Initialization error:", e);
+                // Fallback attempt to load data if config fails? 
+                // Hard to do without URLs. Just show error.
+                document.getElementById('errorMsg').textContent = "Greška u inicijalizaciji: " + e.message;
+                document.getElementById('errorState').style.display = 'block';
+                document.getElementById('loadingState').style.display = 'none';
+            }
+        }
+
+        async function loadData(preloadedConfig = null) {
             const loading = document.getElementById('loadingState');
             const error = document.getElementById('errorState');
             const table = document.getElementById('dataTable');
 
             try {
-                // Show loading
-                loading.style.display = 'block';
+                // Show loading only if table is hidden (first load)
+                if (table.style.display === 'none') {
+                    loading.style.display = 'block';
+                }
                 error.style.display = 'none';
-                table.style.display = 'none';
 
-                // Fetch config first
-                const configResponse = await fetch('config.json?t=' + Date.now());
-                if (!configResponse.ok) throw new Error("Ne mogu učitati konfiguraciju");
-                const config = await configResponse.json();
+                let config = preloadedConfig;
+                if (!config) {
+                    const configResponse = await fetch('config.json?t=' + Date.now());
+                    if (!configResponse.ok) throw new Error("Ne mogu učitati konfiguraciju");
+                    config = await configResponse.json();
+                }
+
                 const csvUrl = config.dataSources.dionice;
 
                 // Fetch directly from Google Sheets
@@ -198,8 +250,7 @@
             });
         }
 
-        loadData();
-        setInterval(loadData, 60000); 
+        init(); 
     </script>
 </body>
 
