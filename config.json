@@ -30,10 +30,6 @@
                 "label": "Meteo Podaci - 3"
             },
             {
-                "src": "meteo.html?id=4",
-                "label": "Meteo Podaci - 4"
-            },
-            {
                 "src": "dionice.html?id=1",
                 "label": "Status Dionica - 1"
             },
