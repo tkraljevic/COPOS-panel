@@ -30,14 +30,6 @@
                 "label": "Meteo Podaci - 3"
             },
             {
-                "src": "meteo.html?id=4",
-                "label": "Meteo Podaci - 4"
-            },
-            {
-                "src": "meteo.html?id=5",
-                "label": "Meteo Podaci - 5"
-            },
-            {
                 "src": "dionice.html?id=1",
                 "label": "Status Dionica - 1"
             },
@@ -104,6 +96,22 @@
             {
                 "src": "dionice.html?id=17",
                 "label": "Status Dionica - 17"
+            },
+                        {
+                "src": "dionice.html?id=18",
+                "label": "Status Dionica - 18"
+            },
+                        {
+                "src": "dionice.html?id=19",
+                "label": "Status Dionica - 19"
+            },
+                        {
+                "src": "dionice.html?id=20",
+                "label": "Status Dionica - 20"
+            },
+                        {
+                "src": "dionice.html?id=21",
+                "label": "Status Dionica - 21"
             }
         ]
     },
