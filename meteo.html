@@ -41,38 +41,56 @@
                 <button class="btn-retry" onclick="loadData()">Pokušaj ponovno</button>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table--compact" id="dataTable" style="display: none;">
-                    <thead>
-                        <tr>
-                            <th rowspan="2" class="meteo-col-location">Lokacija</th>
-                            <th rowspan="2" class="text-center meteo-col-datetime">Datum/Vrijeme</th>
-                            <th colspan="3" class="text-center">Temperatura (°C)</th>
-                            <th colspan="3" class="text-center">Vjetar (m/s)</th>
-                            <th rowspan="2" class="text-center meteo-col-narrow">Tlak (hPa)</th>
-                            <th rowspan="2" class="text-center meteo-col-narrow">Vlaga (%)</th>
-                            <th colspan="3" class="text-center">Oborina (mm)</th>
-                        </tr>
-                        <tr>
-                            <!-- Temp subheaders -->
-                            <th class="text-center meteo-col-narrow">Trenutna</th>
-                            <th class="text-center meteo-col-extra-narrow">Min</th>
-                            <th class="text-center meteo-col-extra-narrow">Max</th>
-                            <!-- Wind subheaders -->
-                            <th class="text-center meteo-col-extra-narrow">Smjer</th>
-                            <th class="text-center meteo-col-narrow">Brzina</th>
-                            <th class="text-center meteo-col-narrow">Udari</th>
-                            <!-- Rain subheaders -->
-                            <th class="text-center meteo-col-extra-narrow">Satna</th>
-                            <th class="text-center meteo-col-narrow">Dnevna</th>
-                            <th class="text-center meteo-col-extra-narrow">Mjes.</th>
-                        </tr>
-                    </thead>
+            <div class="grid-table meteo-grid" id="dataTable" style="display: none;">
+                <!-- Complex Header for Meteo -->
+                <div class="grid-header meteo-header-group">
+                    <!-- Top Row -->
+                    <div class="header-cell cell-loc-head">Lokacija</div>
+                    <div class="header-cell cell-time-head">Datum/Vrijeme</div>
+                    <div class="header-cell cell-temp-head">Temperatura (°C)</div>
+                    <div class="header-cell cell-wind-head">Vjetar (m/s)</div>
+                    <div class="header-cell cell-pres-head">Tlak (hPa)</div>
+                    <div class="header-cell cell-hum-head">Vlaga (%)</div>
+                    <div class="header-cell cell-rain-head">Oborina (mm)</div>
 
-                    <tbody id="tableBody">
-                        <!-- Rows will be populated by JS -->
-                    </tbody>
-                </table>
+                    <!-- Sub Row (Visual only, or flattened?) -->
+                    <!-- Flattening headers for Grid is easier. 
+                         Let's just put the sub-headers in the second row of the grid header container?
+                         
+                         Actually, standard approach:
+                         Grid Header Container -> Display Grid (same cols as body).
+                         Items for top row span columns.
+                         Items for sub row occupy single columns.
+                    -->
+                </div>
+                <!-- Sub-header row for specific columns -->
+                <div class="grid-header meteo-subheader">
+                    <!-- Empty for Loc/Time/Pres/Hum if they span 2 rows? 
+                          Or we just repeat/leave empty?
+                          Let's simulate the visual stack.
+                     -->
+                    <div class="empty"></div> <!-- loc -->
+                    <div class="empty"></div> <!-- time -->
+
+                    <div class="text-center">Trenutna</div>
+                    <div class="text-center">Min</div>
+                    <div class="text-center">Max</div>
+
+                    <div class="text-center">Smjer</div>
+                    <div class="text-center">Brzina</div>
+                    <div class="text-center">Udari</div>
+
+                    <div class="empty"></div> <!-- pres -->
+                    <div class="empty"></div> <!-- hum -->
+
+                    <div class="text-center">Satna</div>
+                    <div class="text-center">Dnevna</div>
+                    <div class="text-center">Mjes.</div>
+                </div>
+
+                <div class="grid-body" id="tableBody">
+                    <!-- Rows will be populated by JS -->
+                </div>
             </div>
         </main>
 
@@ -119,7 +137,7 @@
 
                 // Show data
                 loading.style.display = 'none';
-                table.style.display = 'table';
+                table.style.display = 'grid';
 
             } catch (e) {
                 console.error("Error loading data:", e);
@@ -160,34 +178,35 @@
                 const oborinaMjesec = row['MJESEČNA OBORINA [mm]'] || "-";
 
 
-                const tr = document.createElement('tr');
+                const tr = document.createElement('div');
+                tr.className = 'grid-row';
 
                 tr.innerHTML = `
-        <td class="meteo-location" data-label="Lokacija">
+        <div class="meteo-location cell-loc" data-label="Lokacija">
           ${lokacija}
-        </td>
-        <td class="text-center" data-label="Datum/Vrijeme">
+        </div>
+        <div class="text-center cell-time" data-label="Datum/Vrijeme">
           ${datum}<br>${vrijeme}
-        </td>
+        </div>
         
         <!-- Temp -->
-        <td class="text-center meteo-temp-current" data-label="Temp (Trenutna)">${temp}</td>
-        <td class="text-center meteo-temp-min" data-label="Temp (Min)">${tempMin}</td>
-        <td class="text-center meteo-temp-max" data-label="Temp (Max)">${tempMax}</td>
+        <div class="text-center meteo-temp-current cell-temp-curr" data-label="Temp (Trenutna)">${temp}</div>
+        <div class="text-center meteo-temp-min cell-temp-min" data-label="Temp (Min)">${tempMin}</div>
+        <div class="text-center meteo-temp-max cell-temp-max" data-label="Temp (Max)">${tempMax}</div>
 
         <!-- Wind -->
-        <td class="text-center meteo-wind-direction" data-label="Vjetar (Smjer)">${vjetarSmjer}</td>
-        <td class="text-center meteo-wind-speed" data-label="Vjetar (Brzina)">${vjetarBrzina}</td>
-        <td class="text-center meteo-wind-gust" data-label="Vjetar (Udari)">${vjetarUdari}</td>
+        <div class="text-center meteo-wind-direction cell-wind-dir" data-label="Vjetar (Smjer)">${vjetarSmjer}</div>
+        <div class="text-center meteo-wind-speed cell-wind-val" data-label="Vjetar (Brzina)">${vjetarBrzina}</div>
+        <div class="text-center meteo-wind-gust cell-wind-gust" data-label="Vjetar (Udari)">${vjetarUdari}</div>
 
         <!-- Pressure/Humidity -->
-        <td class="text-center meteo-pressure" data-label="Tlak">${tlak}</td>
-        <td class="text-center meteo-humidity" data-label="Vlaga">${vlaga}</td>
+        <div class="text-center meteo-pressure cell-pres" data-label="Tlak">${tlak}</div>
+        <div class="text-center meteo-humidity cell-hum" data-label="Vlaga">${vlaga}</div>
 
         <!-- Rain -->
-        <td class="text-center meteo-rain" data-label="Oborina (Satna)">${oborinaSat}</td>
-        <td class="text-center meteo-rain-daily" data-label="Oborina (Dnevna)">${oborinaDan}</td>
-        <td class="text-center meteo-rain" data-label="Oborina (Mjesečna)">${oborinaMjesec}</td>
+        <div class="text-center meteo-rain cell-rain-h" data-label="Oborina (Satna)">${oborinaSat}</div>
+        <div class="text-center meteo-rain-daily cell-rain-d" data-label="Oborina (Dnevna)">${oborinaDan}</div>
+        <div class="text-center meteo-rain cell-rain-m" data-label="Oborina (Mjesečna)">${oborinaMjesec}</div>
       `;
                 tbody.appendChild(tr);
             });
