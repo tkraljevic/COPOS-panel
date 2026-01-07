@@ -2,6 +2,15 @@
 
 Ovo je web aplikacija "Info Panel" za Centar obrane od poplava – Osijek. Dizajnirana je za prikaz na velikim ekranima (kiosk mode) i automatski rotira ključne informacije: vodostaje, meteorološke podatke i status branjenih dionica.
 
+## Verzija v0.1.6-alpha
+
+Ova verzija implementira **Offline Mode** funkcionalnost.
+
+**Glavne promjene:**
+*   **Keširanje Podataka**: Aplikacija sada automatski sprema (kešira) zadnje uspješno učitane podatke u lokalnu memoriju preglednika (`localStorage`).
+*   **Offline Indikator**: U slučaju gubitka internetske veze ili nemogućnosti dohvata novih podataka, aplikacija automatski prikazuje crvenu traku na vrhu ekrana s porukom "OFFLINE MODE" i vremenom zadnjeg uspješnog ažuriranja.
+*   **Kontinuitet Rada**: Panel više neće prikazivati ekran s greškom ("Error State") ako internet nestane, već će nastaviti vrtjeti zadnje poznate podatke dok se veza ne uspostavi.
+
 ## Verzija v0.1.5-alpha
 
 Ova verzija donosi značajna poboljšanja stabilnosti i robusnosti sustava za parsiranje podataka.
@@ -147,6 +156,22 @@ Aplikacija se automatski prilagođava veličini ekrana na kojem se prikazuje.
 
 ### 2. Video Zidovi / Mega Ekrani (> 2560px)
 *   **Auto-Scaling**: Za ekrane vrlo visokih rezolucija (4K i veće), aplikacija automatski povećava veličinu fonta i sučelja kako bi podaci bili čitljivi s udaljenosti.
+
+---
+
+## Offline Način Rada
+
+Aplikacija je dizajnirana da bude otporna na prekide internetske veze.
+
+### Kako funkcionira?
+1.  **Spremanje**: Svaki put kada aplikacija uspješno dohvati CSV s Google Sheetsa, sprema ga u `localStorage` preglednika.
+2.  **Detekcija Greške**: Ako dohvat podataka ne uspije (nema interneta, Google Sheets je nedostupan), aplikacija automatski učitava spremljene podatke.
+3.  **Indikacija**: Na vrhu ekrana pojavljuje se crvena traka **"OFFLINE MODE"** s vremenom kada su podaci zadnji put uspješno osvježeni.
+
+### Ograničenja
+*   Podaci se spremaju samo u **tom specifičnom pregledniku** na tom uređaju.
+*   Ako očistite povijest/cache preglednika, offline podaci će biti obrisani.
+*   Potrebno je barem jedno uspješno učitavanje dok je uređaj online da bi offline mod radio.
 
 ---
 

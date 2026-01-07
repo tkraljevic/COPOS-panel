@@ -545,6 +545,22 @@ body {
     display: none !important;
 }
 
+/* OFFLINE BANNER */
+.offline-banner {
+    display: none;
+    background: #c0392b;
+    color: white;
+    text-align: center;
+    padding: 0.5rem;
+    font-weight: bold;
+    font-size: 0.9rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
 /* ==========================================================================
    RESPONSIVE DESIGN
 ========================================================================== */

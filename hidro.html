@@ -14,6 +14,11 @@
 <body>
     <div class="app">
 
+        <!-- Offline Banner -->
+        <div id="offlineBanner" class="offline-banner">
+            OFFLINE MODE (Prikazuju se zadnji poznati podaci: <span id="offlineTime">-</span>)
+        </div>
+
         <!-- HEADER -->
         <header class="header">
             <div>
@@ -172,6 +177,12 @@
             const loading = document.getElementById('loadingState');
             const error = document.getElementById('errorState');
             const table = document.getElementById('dataTable');
+            const offlineBanner = document.getElementById('offlineBanner');
+            const offlineTime = document.getElementById('offlineTime');
+
+            // Cache Key
+            const CACHE_KEY_DATA = 'copos_hidro_data';
+            const CACHE_KEY_TIME = 'copos_hidro_time';
 
             try {
                 if (table.style.display === 'none') {
@@ -190,23 +201,52 @@
                 const response = await fetch(csvUrl + '&t=' + Date.now());
                 if (!response.ok) throw new Error("Ne mogu dohvatiti podatke (Google Sheets)");
                 const text = await response.text();
-                const data = parseCSV(text);
 
-                const urlParams = new URLSearchParams(window.location.search);
-                const slideId = urlParams.get('id');
-                let filtered = data;
-                if (slideId) filtered = data.filter(row => row.SLAJD === slideId);
+                // Save Cache
+                localStorage.setItem(CACHE_KEY_DATA, text);
+                localStorage.setItem(CACHE_KEY_TIME, new Date().toLocaleString('hr-HR'));
+                offlineBanner.style.display = 'none';
 
-                renderTable(filtered);
+                processAndRender(text);
 
                 loading.style.display = 'none';
                 table.style.display = 'grid';
 
             } catch (e) {
-                console.error("Greška pri učitavanju:", e);
-                loading.style.display = 'none';
-                error.style.display = 'block';
-                document.getElementById('errorMsg').textContent = e.message || "Provjerite internetsku vezu.";
+                console.warn("Network error, trying cache...", e);
+
+                const cachedData = localStorage.getItem(CACHE_KEY_DATA);
+                const cachedTime = localStorage.getItem(CACHE_KEY_TIME);
+
+                if (cachedData) {
+                    offlineBanner.style.display = 'block';
+                    offlineTime.textContent = cachedTime || "Nepoznato";
+                    processAndRender(cachedData);
+
+                    loading.style.display = 'none';
+                    table.style.display = 'grid';
+                    error.style.display = 'none';
+                } else {
+                    console.error("No cache available:", e);
+                    loading.style.display = 'none';
+                    error.style.display = 'block';
+                    document.getElementById('errorMsg').textContent = e.message || "Provjerite internetsku vezu.";
+                }
+            }
+        }
+
+        function processAndRender(csvText) {
+            const data = parseCSV(csvText);
+            const urlParams = new URLSearchParams(window.location.search);
+            const slideId = urlParams.get('id');
+            let filtered = data;
+            if (slideId) filtered = data.filter(row => row.SLAJD === slideId);
+
+            renderTable(filtered);
+            if (filtered.length > 0) {
+                const title = "HIDROLOŠKI PODACI";
+                const el = document.getElementById('pageTitle');
+                if (el) el.textContent = title;
             }
         }
 
