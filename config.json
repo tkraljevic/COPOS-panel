@@ -4,7 +4,7 @@
         "subtitle": "INFO PANEL",
         "footerText": "Izvor: Hrvatske vode / DHMZ / SHMU / OVF",
         "themeColor": "#0b1118",
-        "metaRefreshSeconds": 3600
+        "metaRefreshSeconds": 18000000
     },
     "rotation": {
         "defaultDuration": 15000,
@@ -142,17 +142,17 @@
     "pages": {
         "hidro": {
             "browserTitle": "COPOS – Hidro Podaci",
-            "pageTitle": "VODOTOK",
+            "pageTitle": "HIDROLOŠKI PODACI mjerodavni za sektor B",
             "pageSubtitle": "Trenutni vodostaji – mjerodavne postaje"
         },
         "meteo": {
             "browserTitle": "COPOS – Meteo Podaci",
-            "pageTitle": "METEOROLOŠKI PODACI",
+            "pageTitle": "METEOROLOŠKI PODACI mjerodavni za sektor B",
             "pageSubtitle": "Trenutno stanje na postajama"
         },
         "dionice": {
             "browserTitle": "COPOS – Status Dionica",
-            "pageTitle": "STATUS DIONICA",
+            "pageTitle": "STATUS DIONICA mjerodavnih za sektor B",
             "pageSubtitle": "Pregled branjenih dionica i odgovornih osoba"
         }
     }
