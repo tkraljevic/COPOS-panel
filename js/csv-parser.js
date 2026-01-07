@@ -14,85 +14,102 @@
  * @returns {Array} Niz objekata gdje su ključevi nazivi stupaca
  */
 function parseCSV(text) {
+  // 0. Sigurnosna provjera ulaza
+  if (!text || typeof text !== 'string' || text.trim().length === 0) {
+    console.warn("CSV Parser: Ulazni tekst je prazan ili nije string.");
+    return [];
+  }
+
   const rows = [];
   let currentRow = [];
   let currentField = "";
-  let inQuotes = false; // Zastavica: jesmo li trenutno unutar navodnika?
+  let inQuotes = false;
 
-  // Prolazimo kroz svako slovo (znak) u tekstu, jedan po jedan
+  // Prolazimo kroz svako slovo
   for (let i = 0; i < text.length; i++) {
     const char = text[i];
     const nextChar = text[i + 1];
 
-    // 1. Obrada navodnika (")
-    // Navodnici su posebni jer omogućuju da unutar polja imamo zarez (npr. "Horvat, Ivan")
     if (char === '"') {
-      // Ako naiđemo na dvostruki navodnik ("") unutar navodnika, to znači doslovni navodnik
       if (inQuotes && nextChar === '"') {
         currentField += '"';
-        i++; // Preskačemo idući znak jer smo ga upravo obradili
+        i++;
       } else {
-        // Inače, ovo je početak ili kraj citiranog dijela
         inQuotes = !inQuotes;
       }
     }
-    // 2. Obrada zareza (,) - označava kraj polja
-    // Samo ako NISMO unutar navodnika
     else if (char === ',' && !inQuotes) {
-      currentRow.push(currentField); // Spremi polje u trenutni red
-      currentField = "";             // Resetiraj polje za iduće
+      currentRow.push(currentField);
+      currentField = "";
     }
-    // 3. Obrada novog reda (\n ili \r) - označava kraj reda
-    // Samo ako NISMO unutar navodnika
     else if ((char === '\n' || char === '\r') && !inQuotes) {
-      // Ako je \r\n (Windowsov stil novog reda), preskoči \n
       if (char === '\r' && nextChar === '\n') {
         i++;
       }
 
-      // Spremi red samo ako ima nekog sadržaja
-      if (currentField || currentRow.length > 0) {
-        currentRow.push(currentField);
+      // Spremanje reda - čak i ako je naizgled prazan, može biti relevantan ako je unutar strukture,
+      // ali za nas su bitni redovi s podacima.
+      // Modifikacija: Spremi red ako sadrži bilo što, pa makar i prazne stringove ako je struktura takva,
+      // ali za ovaj projekt preskačemo potpuno prazne linije.
+      currentRow.push(currentField);
 
-        // Provjeri je li red prazan (samo razmaci)
-        if (currentRow.some(field => field.trim() !== "")) {
-          rows.push(currentRow);
-        }
-
-        // Resetiraj za novi red
-        currentRow = [];
-        currentField = "";
+      if (currentRow.length > 1 || (currentRow.length === 1 && currentRow[0].trim() !== "")) {
+        rows.push(currentRow);
       }
+
+      currentRow = [];
+      currentField = "";
     }
-    // 4. Običan znak - samo ga dodaj u trenutno polje
     else {
       currentField += char;
     }
   }
 
-  // Dodaj zadnje polje i red ako datoteka ne završava novim redom
+  // Handle last row
   if (currentField || currentRow.length > 0) {
     currentRow.push(currentField);
-    if (currentRow.some(field => field.trim() !== "")) {
+    if (currentRow.length > 1 || (currentRow.length === 1 && currentRow[0].trim() !== "")) {
       rows.push(currentRow);
     }
   }
 
-  // Ako nismo našli podatke, vrati prazan niz
   if (rows.length === 0) return [];
 
-  // Prvi red sadrži nazive stupaca (Headere)
-  const headers = rows[0].map(h => h.trim()); // .trim() miče razmake s početka i kraja
+  // 1. Obrada zaglavlja (Headers)
+  // Trimamo i rješavamo duplikate
+  const originalHeaders = rows[0].map(h => h ? h.trim() : "UNKNOWN");
+  const headers = [];
+  const headerCounts = {};
+
+  originalHeaders.forEach(h => {
+    if (headerCounts[h]) {
+      headerCounts[h]++;
+      headers.push(`${h}_${headerCounts[h]}`); // Npr. "Vrijednost_2"
+    } else {
+      headerCounts[h] = 1;
+      headers.push(h);
+    }
+  });
+
   const data = [];
 
-  // Prolazimo kroz ostale redove (od indexa 1) i pretvaramo ih u objekte
+  // 2. Mapiranje podataka
+  // Preskačemo prvi red (header)
   for (let i = 1; i < rows.length; i++) {
-    const row = {};
+    const rowValues = rows[i];
+
+    // Upozorenje za neslaganje broja stupaca (samo u console log, ne rušimo app)
+    if (rowValues.length !== headers.length) {
+      // Tihi log za debugiranje, da ne spamamo previše ako je cijeli file zbrkan
+      if (i < 5) console.debug(`CSV Red ${i}: Broj stupaca (${rowValues.length}) ne odgovara zaglavlju (${headers.length}).`);
+    }
+
+    const rowObj = {};
     headers.forEach((header, index) => {
-      // Spajamo naziv stupca (header) s vrijednošću na tom indeksu
-      row[header] = rows[i][index] ? rows[i][index].trim() : "";
+      // Ako polje ne postoji, stavi prazan string
+      rowObj[header] = rowValues[index] ? rowValues[index].trim() : "";
     });
-    data.push(row);
+    data.push(rowObj);
   }
 
   return data;
