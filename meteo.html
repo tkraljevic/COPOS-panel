@@ -155,6 +155,10 @@
             const CACHE_KEY_DATA = 'copos_meteo_data';
             const CACHE_KEY_TIME = 'copos_meteo_time';
 
+            /**
+             * Učitavanje meteo podataka
+             * Specifičnost: Očekuje se puno više stupaca nego kod hidro/dionica.
+             */
             try {
                 if (table.style.display === 'none') {
                     loading.style.display = 'block';
@@ -228,6 +232,11 @@
             renderTable(filtered);
         }
 
+        /**
+         * Renderiranje meteo tablice
+         * Ovdje je ključno mapiranje točnih naziva stupaca iz CSV-a.
+         * Ako Google Sheets promijeni nazive stupaca, ovo će se morati ažurirati.
+         */
         function renderTable(rows) {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = "";
@@ -236,8 +245,9 @@
                 // CSV Cols: SLAJD,LOKACIJA,DATUM,VRIJEME,TEMPERATURA ZRAKA C°,MIN TEMP. C°,MAX TEMP. C°,SMJER VJETRA,VJETAR [m/s],MAX UDARI VJETRA [m/s],TLAK ZRAKA [hPa],VLAGA [%],SATNA OBORINA [mm],DNEVNA OBORINA [mm],MJESEČNA OBORINA [mm]
 
                 // Map columns
+                // NAPOMENA: Koristimo točne nazive iz CSV headera.
                 const lokacija = row['LOKACIJA'];
-                // Skip rows without valid location or temperature (header rows in body)
+                // Preskačemo redove koji nemaju lokaciju (često prazni redovi ili footer u CSV-u)
                 if (!lokacija || !row['TEMPERATURA ZRAKA C°']) return;
 
                 const datum = row['DATUM'] || "";

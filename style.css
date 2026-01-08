@@ -95,7 +95,10 @@ body {
     padding: 0;
 }
 
-/* GRID TABLE */
+/* ==========================================================================
+   GRID TABLE SYSTEM
+   Glavni layout za prikaz podataka. Koristi CSS Grid za precizno poravnanje.
+   ========================================================================== */
 .grid-table {
     width: 100%;
     background: var(--bg-surface);
@@ -213,7 +216,9 @@ body {
     text-align: center;
 }
 
-/* PODACI */
+/* PODACI - STILOVI TEKSTA
+   Definicije veličina fontova i boja za različite vrste podataka
+   ========================================================================== */
 .station {
     font-size: 1.1rem;
     font-weight: 700;
@@ -255,7 +260,10 @@ body {
     text-align: left !important;
 }
 
-/* STATUS */
+/* STATUS INDICATORS
+   Boje i stilovi za oznake stanja (Zeleno, Žuto, Crveno...)
+   Koristi prozirne pozadine s punim obrubom za moderan izgled.
+   ========================================================================== */
 .status {
     display: inline-flex;
     align-items: center;
@@ -569,8 +577,11 @@ body {
 }
 
 /* ==========================================================================
-   RESPONSIVE DESIGN
-========================================================================== */
+   RESPONSIVE DESIGN (Medijski upiti)
+   Prilagodba za različite veličine ekrana.
+   Strategija: "Desktop First" (zadani stilovi su za desktop),
+   a ovdje definiramo iznimke za manje/veće ekrane.
+   ========================================================================== */
 
 /* 4K+ Screens */
 @media (min-width: 2560px) {
@@ -611,9 +622,11 @@ body {
 }
 
 /* ==========================================================================
-   MOBILE (<768px) - KRITIČNA ISPRAVKA
-   ✅ Pravilno zatvoreni selektori - prethodna greška riješena
-========================================================================== */
+   MOBILE (<768px) - KARTICNI PRIKAZ
+   Na mobitelima tablica postaje niz kartica.
+   Grid se pretvara u Flexbox stupac.
+   Zaglavlja se skrivaju, a labele se dodaju via CSS ili HTML.
+   ========================================================================== */
 @media (max-width: 767px) {
     html {
         font-size: 14px;

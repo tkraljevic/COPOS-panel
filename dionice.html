@@ -150,6 +150,14 @@
             }
         }
 
+        /**
+         * Glavna funkcija za dohvat podataka
+         * Logika:
+         * 1. Pokušaj dohvatiti config (ako nije predan)
+         * 2. Pokušaj dohvatiti CSV s Google Sheets (mreža)
+         *    -> Ako uspije: Spremi u Cache i prikaži
+         *    -> Ako ne uspije: Učitaj iz Cache-a (Offline mode)
+         */
         async function loadData(preloadedConfig = null) {
             const loading = document.getElementById('loadingState');
             const error = document.getElementById('errorState');
@@ -203,7 +211,21 @@
                 const cachedData = localStorage.getItem(CACHE_KEY_DATA);
                 const cachedTime = localStorage.getItem(CACHE_KEY_TIME);
 
+                // SPREMANJE U CACHE (Lokalna memorija preglednika)
+                // Ovo osigurava da imamo podatke čak i ako sljedeći put ne bude interneta
+                localStorage.setItem(CACHE_KEY_DATA, text);
+                localStorage.setItem(CACHE_KEY_TIME, new Date().toLocaleString('hr-HR'));
+
+                // Ako je uspješno, sakrij offline banner
+                offlineBanner.style.display = 'none';
+                offlineTime.textContent = cachedTime || "Nepoznato";
+
+                processAndRender(cachedData);
+
+                loading.style.display = 'none';
+                table.style.display = 'grid';
                 if (cachedData) {
+                    // Pronašli smo stare podatke! Prikazujemo njih uz upozorenje.
                     console.log("Serving from cache.");
                     offlineBanner.style.display = 'block';
                     offlineTime.textContent = cachedTime || "Nepoznato";
@@ -223,10 +245,16 @@
             }
         }
 
+        /**
+         * Obrada sirovog CSV teksta i priprema za prikaz
+         */
         function processAndRender(csvText) {
+            // Parsiramo CSV u niz objekata
             const data = parseCSV(csvText);
 
-            // Get Slide ID from URL (consistent with meteo.html)
+            // Pobiramo ID slajda iz URL-a (npr. dionice.html?id=1)
+            // Ovo omogućuje da ista HTML datoteka prikazuje različite skupove podataka
+            // ovisno o tome kako je konfigurirana u config.json
             const urlParams = new URLSearchParams(window.location.search);
             const slideId = urlParams.get('id');
 
@@ -239,6 +267,9 @@
             renderTable(filtered);
         }
 
+        /**
+         * Kreiranje HTML elemenata tablice (Grid redova)
+         */
         function renderTable(rows) {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = "";
@@ -268,9 +299,12 @@
                 const statusText = row['STATUS'] || "";
                 const statusClass = getStatusClass(statusText);
 
+                // Za svaki red podataka kreiramo novi DIV s klasom grid-row
                 const tr = document.createElement('div');
                 tr.className = 'grid-row';
 
+                // Ubacujemo HTML sadržaj. Koristimo 'data-label' atribut koji CSS može koristiti
+                // za prikaz na mobitelima (npr. ::before { content: attr(data-label); })
                 tr.innerHTML = `
         <div data-label="Dionica / Vodotok">
           <div class="station dionica-code">${oznaka}</div>

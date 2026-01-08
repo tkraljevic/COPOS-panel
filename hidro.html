@@ -173,6 +173,10 @@
             }
         }
 
+        /**
+         * Glavna funkcija (slična kao u dionice.html)
+         * Učitava podatke o vodostajima
+         */
         async function loadData(preloadedConfig = null) {
             const loading = document.getElementById('loadingState');
             const error = document.getElementById('errorState');
@@ -235,11 +239,17 @@
             }
         }
 
+        /**
+         * Obrada podataka
+         */
         function processAndRender(csvText) {
             const data = parseCSV(csvText);
             const urlParams = new URLSearchParams(window.location.search);
             const slideId = urlParams.get('id');
             let filtered = data;
+
+            // Filtriramo samo onaj slide koji je zatražen u configu.
+            // Napomena: Google Sheets mora imati stupac 'SLAJD' s odgovarajućim brojem.
             if (slideId) filtered = data.filter(row => row.SLAJD === slideId);
 
             renderTable(filtered);
