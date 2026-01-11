@@ -214,7 +214,7 @@ Zahtijeva točne nazive stupaca jer je tablica kompleksna:
 | :------------------------------ | :---------------------------------- |
 | **OZNAKA PODRUČJA**             | Šifra dionice (npr. `A.12.3`).      |
 | **VODOTOK**                     | Ime rijeke/kanala.                  |
-| **NASIP**                       | (Novo v0.1.7) Opis nasipa.           |
+| **NASIP**                       | (Novo v0.1.7) Opis nasipa.          |
 | **STATUS**                      | Stanje obrane (boja statusa).       |
 | **MJERODAVNI VODOMJER**         | Ime referentne postaje.             |
 | **RUKOVODITELJ** / **ZAMJENIK** | Imena odgovornih osoba.             |
